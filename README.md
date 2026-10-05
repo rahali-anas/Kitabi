@@ -20,14 +20,12 @@ React 19, Vite 8, TypeScript, Tailwind 4, shadcn/ui, BlockNote, Dexie, Zustand.
 npm install
 npm run dev
 
-text
-
 App runs at `http://localhost:5173/story-workstation/`.
 
 ## Build
 npm run build
 
-text
+
 
 ## Layout
 
