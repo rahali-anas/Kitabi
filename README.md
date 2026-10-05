@@ -25,8 +25,6 @@ App runs at `http://localhost:5173/story-workstation/`.
 ## Build
 npm run build
 
-
-
 ## Layout
 
 - `src/components/` — UI components
