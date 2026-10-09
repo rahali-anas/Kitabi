@@ -1,23 +1,24 @@
 import { useEffect, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Modal, ModalField } from '@/components/ui-q/Modal';
 import { db } from '@/db/database';
+import type { Module } from './BookCard';
+
+const MODULE_TITLES: Record<Module, string> = {
+  story: 'New Story',
+  diary: 'New Diary',
+  journal: 'New Journal',
+};
 
 export function NewProjectModal({
   open,
   onClose,
   onCreated,
+  module = 'story',
 }: {
   open: boolean;
   onClose: () => void;
   onCreated: (id: string) => void;
+  module?: Module;
 }) {
   const [name, setName] = useState('');
   const [powerSystem, setPowerSystem] = useState(true);
@@ -39,8 +40,8 @@ export function NewProjectModal({
     await db.projects.add({
       id,
       name: trimmed,
-      type: 'story',
-      hasPowerSystem: powerSystem,
+      type: module,
+      hasPowerSystem: module === 'story' ? powerSystem : false,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
@@ -48,55 +49,52 @@ export function NewProjectModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="italic">New Project</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-3">
-          <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-1)]">
-              Project name *
-            </label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  void create();
-                }
-              }}
-              autoFocus
-            />
-          </div>
-          <div>
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-1)]">
-              Features
-            </label>
-            <label className="flex items-center gap-2.5 mt-1.5 px-3 py-2.5 rounded-md border border-[var(--line)] bg-[var(--bg-3)] cursor-pointer">
-              <input
-                type="checkbox"
-                checked={powerSystem}
-                onChange={(e) => setPowerSystem(e.target.checked)}
-                className="w-4 h-4 accent-[var(--accent-1)]"
-              />
-              <span className="text-[12.5px] italic font-semibold">
-                Enable Power System
-              </span>
-            </label>
-            <p className="text-[11px] italic text-[var(--text-2)] mt-1.5">
-              You can change this later from the Projects menu.
-            </p>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={MODULE_TITLES[module]}
+      maxWidth={480}
+      footer={
+        <>
+          <button className="q-btn q-btn-ghost" onClick={onClose}>
             Cancel
-          </Button>
-          <Button onClick={create}>Create Project</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </button>
+          <button className="q-btn q-btn-primary" onClick={create}>
+            Create
+          </button>
+        </>
+      }
+    >
+      <ModalField label="Project name *">
+        <input
+          className="q-input"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              void create();
+            }
+          }}
+          autoFocus
+        />
+      </ModalField>
+
+      {module === 'story' && (
+        <ModalField label="Features">
+          <label className="q-check-row">
+            <input
+              type="checkbox"
+              checked={powerSystem}
+              onChange={(e) => setPowerSystem(e.target.checked)}
+            />
+            <span>Enable Power System</span>
+          </label>
+          <p className="q-field-hint">
+            You can change this later from the Projects menu.
+          </p>
+        </ModalField>
+      )}
+    </Modal>
   );
 }

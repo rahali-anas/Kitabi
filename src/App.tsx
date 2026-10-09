@@ -16,7 +16,15 @@ import { WelcomeScreen } from '@/components/welcome/WelcomeScreen';
 import { ProjectsModal } from '@/components/welcome/ProjectsModal';
 import { CharacterModal } from '@/components/characters/CharacterModal';
 import { NoteModal } from '@/components/notes/NoteModal';
-import { Folder, Moon, Sun } from 'lucide-react';
+import { StorylineModal } from '@/components/storylines/StorylineModal';
+import { SearchModal } from '@/components/search/SearchModal';
+import {
+  Folder,
+  Moon,
+  Sun,
+  Search as SearchIcon,
+  Calendar as CalendarIcon,
+} from 'lucide-react';
 
 const NAV: { key: View; label: string }[] = [
   { key: 'dashboard', label: 'Dashboard' },
@@ -39,6 +47,7 @@ function App() {
   } = useUIStore();
   const projects = useLiveQuery(() => db.projects.toArray(), []);
   const [projectsOpen, setProjectsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const [dark, setDark] = useState(() =>
     document.documentElement.classList.contains('dark')
@@ -51,26 +60,36 @@ function App() {
   useEffect(() => {
     if (projects && projects.length === 0) {
       db.projects.add({
-      id: crypto.randomUUID(),
-      name: 'My First Project',
-      type: 'story',
-      hasPowerSystem: true,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+        id: crypto.randomUUID(),
+        name: 'My First Project',
+        type: 'story',
+        hasPowerSystem: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
     }
   }, [projects]);
 
-  // Focus mode: body class + keyboard shortcuts
+  // Focus mode: body class
   useEffect(() => {
     document.body.classList.toggle('focus-mode', focusMode);
   }, [focusMode]);
 
+  // Global keyboard shortcuts
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.shiftKey && (e.key === 'F' || e.key === 'f')) {
         e.preventDefault();
         toggleFocusMode();
+        return;
+      }
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        !e.shiftKey &&
+        (e.key === 'f' || e.key === 'F')
+      ) {
+        e.preventDefault();
+        setSearchOpen((v) => !v);
         return;
       }
       if (e.key === 'Escape' && focusMode) {
@@ -81,9 +100,10 @@ function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [focusMode, toggleFocusMode, setFocusMode]);
 
-  // Cross-view wiki-link → modal hosts
+  // Cross-view wiki-link / search → modal hosts
   const [wikiChar, setWikiChar] = useState<CharRow | null>(null);
   const [wikiNote, setWikiNote] = useState<NoteRow | null>(null);
+  const [wikiStoryline, setWikiStoryline] = useState<any | null>(null);
 
   useEffect(() => {
     const onChar = async (e: Event) => {
@@ -98,11 +118,19 @@ function App() {
       const row = await db.notes.get(detail.id);
       if (row) setWikiNote(row);
     };
+    const onStoryline = async (e: Event) => {
+      const detail = (e as CustomEvent).detail as { id: string };
+      if (!detail?.id) return;
+      const row = await db.storylines.get(detail.id);
+      if (row) setWikiStoryline(row);
+    };
     window.addEventListener('qisati:open-character', onChar);
     window.addEventListener('qisati:open-note', onNote);
+    window.addEventListener('qisati:open-storyline', onStoryline);
     return () => {
       window.removeEventListener('qisati:open-character', onChar);
       window.removeEventListener('qisati:open-note', onNote);
+      window.removeEventListener('qisati:open-storyline', onStoryline);
     };
   }, []);
 
@@ -120,10 +148,20 @@ function App() {
   return (
     <div className="min-h-screen">
       <header className="q-topbar">
-        <div className="q-brand">
+        <button
+          className="q-brand"
+          onClick={() => setActiveProject(null)}
+          title="Back to library"
+        >
           <img src="./logo.png" alt="" />
-          <span>Qisati</span>
-        </div>
+          <span>
+            {activeProject.type === 'diary'
+              ? 'Modakirati'
+              : activeProject.type === 'journal'
+                ? 'Modawanati'
+                : 'Qisati'}
+          </span>
+        </button>
 
         <button
           className="q-project-btn"
@@ -135,20 +173,34 @@ function App() {
         </button>
 
         <nav className="q-nav">
-          {NAV.filter((n) => n.key !== 'lore' || activeProject.hasPowerSystem).map(
-            (n) => (
-              <button
-                key={n.key}
-                onClick={() => setView(n.key)}
-                className={`q-nav-btn ${view === n.key ? 'active' : ''}`}
-              >
-                {n.label}
-              </button>
-            )
-          )}
+          {NAV.filter(
+            (n) => n.key !== 'lore' || activeProject.hasPowerSystem
+          ).map((n) => (
+            <button
+              key={n.key}
+              onClick={() => setView(n.key)}
+              className={`q-nav-btn ${view === n.key ? 'active' : ''}`}
+            >
+              {n.label}
+            </button>
+          ))}
         </nav>
 
         <div className="q-topbar-right">
+          <button
+            className="q-icon-btn"
+            onClick={() => setSearchOpen(true)}
+            title="Search (Ctrl+F)"
+          >
+            <SearchIcon className="w-4 h-4" />
+          </button>
+          <button
+            className="q-icon-btn"
+            onClick={() => alert('Calendar coming next')}
+            title="Calendar"
+          >
+            <CalendarIcon className="w-4 h-4" />
+          </button>
           <button
             className="q-icon-btn"
             onClick={() => setDark((d) => !d)}
@@ -169,7 +221,10 @@ function App() {
       </main>
 
       {focusMode && (
-        <button className="q-focus-exit" onClick={() => setFocusMode(false)}>
+        <button
+          className="q-focus-exit"
+          onClick={() => setFocusMode(false)}
+        >
           Exit focus — Esc
         </button>
       )}
@@ -190,6 +245,18 @@ function App() {
         onClose={() => setWikiNote(null)}
         projectId={activeProject.id}
         editing={wikiNote}
+      />
+      <StorylineModal
+        open={!!wikiStoryline}
+        onClose={() => setWikiStoryline(null)}
+        projectId={activeProject.id}
+        editing={wikiStoryline}
+      />
+
+      <SearchModal
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        projectId={activeProject.id}
       />
     </div>
   );

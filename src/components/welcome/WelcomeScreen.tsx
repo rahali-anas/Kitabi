@@ -1,8 +1,10 @@
+import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Project } from '@/db/database';
 import { useUIStore } from '@/stores/uiStore';
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { Modal } from '@/components/ui-q/Modal';
+import { BookCard, MODULES, type Module } from './BookCard';
 import { NewProjectModal } from './NewProjectModal';
 
 function timeAgo(ts: number): string {
@@ -14,95 +16,148 @@ function timeAgo(ts: number): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+const COMING_SOON: Record<Module, string | null> = {
+  story: null,
+  diary: 'Modakirati is under construction. Come back soon.',
+  journal: 'Modawanati is under construction. Come back soon.',
+};
+
 export function WelcomeScreen() {
   const setActiveProject = useUIStore((s) => s.setActiveProject);
   const projects = useLiveQuery(() => db.projects.toArray(), []);
+  const [openModule, setOpenModule] = useState<Module | null>(null);
   const [newOpen, setNewOpen] = useState(false);
+  const [newModule, setNewModule] = useState<Module>('story');
+  const [comingSoon, setComingSoon] = useState<Module | null>(null);
 
-  const sorted = (projects ?? [])
-    .slice()
-    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  const byModule = useMemo(() => {
+    const map: Record<Module, Project[]> = {
+      story: [],
+      diary: [],
+      journal: [],
+    };
+    for (const p of projects ?? []) {
+      const m = (p.type || 'story') as Module;
+      if (map[m]) map[m].push(p);
+    }
+    for (const k of Object.keys(map) as Module[]) {
+      map[k].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    }
+    return map;
+  }, [projects]);
+
+  const openNew = (m: Module) => {
+    if (COMING_SOON[m]) {
+      setComingSoon(m);
+      return;
+    }
+    setNewModule(m);
+    setNewOpen(true);
+  };
 
   return (
     <div className="q-welcome">
       <div className="q-welcome-head">
         <div className="q-welcome-brand">
-          <img src="./logo.png" alt="" />
-          <span>
-            <span >Qisati</span>
-          </span>
+          <img src="./logo1.png" alt="" />
+          <span>Kitabi</span>
         </div>
         <p className="q-welcome-sub">
-          A writing station for stories, journals, and everything in between.
+          A writing station for stories, diaries, and journals.
         </p>
       </div>
 
-      {sorted.length > 0 && (
-        <div className="q-welcome-grid q-stagger">
-          {sorted.map((p) => (
-            <ProjectCard
-              key={p.id}
-              project={p}
-              onEnter={() => setActiveProject(p.id)}
+      {!openModule && (
+        <div className="q-book-grid">
+          {MODULES.map((m) => (
+            <BookCard
+              key={m.key}
+              module={m}
+              count={byModule[m.key].length}
+              onOpen={() => setOpenModule(m.key)}
+              onNew={() => openNew(m.key)}
             />
           ))}
         </div>
       )}
 
-      {sorted.length === 0 && (
-        <div className="q-page-sub" style={{ marginBottom: 24, textAlign: 'center' }}>
-          No projects yet. Begin one below.
+      {openModule && (
+        <div className="q-module-view">
+          <div className="q-module-head">
+            <button
+              className="q-module-back"
+              onClick={() => setOpenModule(null)}
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> All modules
+            </button>
+            <div className="q-module-title">
+              {MODULES.find((m) => m.key === openModule)?.name}
+            </div>
+            <button
+              className="q-btn q-btn-primary"
+              onClick={() => openNew(openModule)}
+            >
+              + {MODULES.find((m) => m.key === openModule)?.newLabel}
+            </button>
+          </div>
+
+          {byModule[openModule].length === 0 ? (
+            <div className="q-module-empty">
+              {COMING_SOON[openModule] ?? 'No projects yet. Start one above.'}
+            </div>
+          ) : (
+            <div className="q-module-list">
+              {byModule[openModule].map((p) => (
+                <button
+                  key={p.id}
+                  className="q-module-row"
+                  onClick={() => setActiveProject(p.id)}
+                >
+                  <div className="q-module-row-name">{p.name}</div>
+                  <div className="q-module-row-meta">
+                    updated {timeAgo(p.updatedAt)}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
-
-      <button className="q-welcome-new" onClick={() => setNewOpen(true)}>
-        <Plus className="w-4 h-4" /> New Project
-      </button>
 
       <NewProjectModal
         open={newOpen}
         onClose={() => setNewOpen(false)}
+        module={newModule}
         onCreated={(id) => {
           setNewOpen(false);
           setActiveProject(id);
         }}
       />
+
+      <Modal
+        open={comingSoon !== null}
+        onClose={() => setComingSoon(null)}
+        title="Coming soon"
+        maxWidth={420}
+        footer={
+          <button
+            className="q-btn q-btn-primary"
+            onClick={() => setComingSoon(null)}
+          >
+            Close
+          </button>
+        }
+      >
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--ink-1)',
+            lineHeight: 1.6,
+          }}
+        >
+          {comingSoon && COMING_SOON[comingSoon]}
+        </p>
+      </Modal>
     </div>
-  );
-}
-
-function ProjectCard({
-  project,
-  onEnter,
-}: {
-  project: Project;
-  onEnter: () => void;
-}) {
-  const counts = useLiveQuery(async () => {
-    const [chapters, characters, storylines, notes] = await Promise.all([
-      db.chapters.where('projectId').equals(project.id).count(),
-      db.characters.where('projectId').equals(project.id).count(),
-      db.storylines.where('projectId').equals(project.id).count(),
-      db.notes.where('projectId').equals(project.id).count(),
-    ]);
-    return { chapters, characters, storylines, notes };
-  }, [project.id]);
-
-  const total = counts
-    ? counts.chapters + counts.characters + counts.storylines + counts.notes
-    : 0;
-
-  return (
-    <button className="q-welcome-card" onClick={onEnter}>
-      <div className="name">{project.name}</div>
-      <div className="meta">
-        {total} items · {timeAgo(project.updatedAt)}
-      </div>
-      {project.hasPowerSystem && (
-        <div className="tag">
-          <span className="chip">Power System</span>
-        </div>
-      )}
-    </button>
   );
 }
