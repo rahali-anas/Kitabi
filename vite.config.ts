@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
 
 export default defineConfig({
-  base: '/story-workstation/',
+  base: '/Kitabi/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

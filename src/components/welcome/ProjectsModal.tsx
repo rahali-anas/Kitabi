@@ -36,24 +36,24 @@ export function ProjectsModal({
   };
 
   const remove = async (p: Project) => {
-    if (!canDelete) {
-      alert('Cannot delete the last project.');
-      return;
-    }
-    if (!confirm(`Delete "${p.name}"?`)) return;
-    await db.transaction('rw', db.projects, db.chapters, db.characters, db.storylines, db.notes, db.powerSystems, async () => {
+      if (!canDelete) {
+        alert('Cannot delete the last project.');
+        return;
+      }
+      if (!confirm(`Delete "${p.name}"?`)) return;
+
       await db.chapters.where('projectId').equals(p.id).delete();
       await db.characters.where('projectId').equals(p.id).delete();
       await db.storylines.where('projectId').equals(p.id).delete();
       await db.notes.where('projectId').equals(p.id).delete();
       await db.powerSystems.where('projectId').equals(p.id).delete();
       await db.projects.delete(p.id);
-    });
-    if (activeProjectId === p.id) {
-      const remaining = sorted.filter((x) => x.id !== p.id);
-      setActiveProject(remaining[0]?.id ?? null);
-    }
-  };
+
+      if (activeProjectId === p.id) {
+        const remaining = sorted.filter((x) => x.id !== p.id);
+        setActiveProject(remaining[0]?.id ?? null);
+      }
+    };
 
   const togglePowerSystem = async (p: Project, on: boolean) => {
     await db.projects.update(p.id, { hasPowerSystem: on, updatedAt: Date.now() });
