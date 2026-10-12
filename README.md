@@ -1,34 +1,34 @@
 # Kitabi
 
-A writing station. One app, three modules:
+Your personal writing station with three modules/Books:
 
-- **Qisati** — story workstation (manuscript, characters, storylines, notes, power system)
-- **Modakirati** — diary
-- **Modawanati** — journal
+- **Qisati** — stories: manuscripts, characters, storylines, world notes, power systems.
+- **Modakirati** — diary. *(in development)*
+- **Modawanati** — journal. *(in development)*
 
-Local-first. No backend. Data lives in the browser (IndexedDB via Dexie). Export and import as JSON.
+**Live app:** https://rahali-anas.github.io/Kitabi/
 
-## Status
+## What it does
 
-v0.1 — Qisati module only.
+Kitabi is an offline-first writing app. Everything you write is stored locally in
+your browser (IndexedDB) — nothing is sent to a server. You can work offline.
 
-## Stack
+Inside the Qisati module *(So Far)*:
 
-React 19, Vite 8, TypeScript, Tailwind 4, shadcn/ui, BlockNote, Dexie, Zustand.
+- **Manuscript** — chapters with a block editor, autosave, drag-to-reorder.
+- **Characters** — cards with portrait, title, race, age, relations, and powers.
+- **Storylines** — a timeline with year-sorted events.
+- **Notes** — tagged notes, pinnable, filterable.
+- **Power System** — categories, entries, sub-entries, rules *(can be disabled)*.
+- **Wiki links** — `[[Name]]` inside the editor. Autocomplete on typing, click to open.
+- **Search** — Ctrl+F, unified search across chapters, characters, storylines, notes.
+- **Focus mode** — Ctrl+Shift+F, hides chrome and centers the editor.
+- **Reminders** — broken wiki links surface on the dashboard until resolved.
 
-## Develop
+## Running locally
+
+```bash
+git clone https://github.com/rahali-anas/Kitabi.git
+cd Kitabi
 npm install
 npm run dev
-
-App runs at `http://localhost:5173/story-workstation/`.
-
-## Build
-npm run build
-
-## Layout
-
-- `src/components/` — UI components
-- `src/pages/` — one per top-level view
-- `src/db/database.ts` — Dexie schema
-- `src/stores/uiStore.ts` — Zustand state
-- `src/lib/` — utility modules (wiki parsing, etc.)
