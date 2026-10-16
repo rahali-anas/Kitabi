@@ -18,6 +18,7 @@ import { ProjectsModal } from '@/components/welcome/ProjectsModal';
 import { CharacterModal } from '@/components/characters/CharacterModal';
 import { NoteModal } from '@/components/notes/NoteModal';
 import { StorylineModal } from '@/components/storylines/StorylineModal';
+import { Index } from '@/pages/Index';
 import { SearchModal } from '@/components/search/SearchModal';
 import {
   Folder,
@@ -33,6 +34,7 @@ const NAV: { key: View; label: string }[] = [
   { key: 'characters', label: 'Characters' },
   { key: 'storylines', label: 'Storylines' },
   { key: 'notes', label: 'Notes' },
+  { key: 'index', label: 'Index' },
   { key: 'lore', label: 'Power System' },
 ];
 
@@ -222,19 +224,12 @@ function App() {
         ) : (
           <>
             {view === 'dashboard' && <Dashboard projectId={activeProject.id} />}
-            {view === 'manuscript' && (
-              <Manuscript projectId={activeProject.id} />
-            )}
-            {view === 'characters' && (
-              <Characters projectId={activeProject.id} />
-            )}
-            {view === 'storylines' && (
-              <Storylines projectId={activeProject.id} />
-            )}
+            {view === 'manuscript' && (<Manuscript projectId={activeProject.id} />)}
+            {view === 'characters' && (<Characters projectId={activeProject.id} />)}
+            {view === 'storylines' && (<Storylines projectId={activeProject.id} />)}
             {view === 'notes' && <Notes projectId={activeProject.id} />}
-            {view === 'lore' && (
-              <PowerSystemPage projectId={activeProject.id} />
-            )}
+            {view === 'index' && <Index projectId={activeProject.id} />}
+            {view === 'lore' && (<PowerSystemPage projectId={activeProject.id} />)}
           </>
         )}
       </main>

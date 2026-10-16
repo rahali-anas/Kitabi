@@ -6,6 +6,7 @@ export type View =
   | 'characters'
   | 'storylines'
   | 'notes'
+  | 'index'
   | 'lore';
 
 interface UIState {
@@ -28,7 +29,12 @@ export const useUIStore = create<UIState>((set, get) => ({
   setView: (view) => set({ view }),
   setActiveChapter: (activeChapterId) => set({ activeChapterId }),
   setActiveProject: (activeProjectId) =>
-    set({ activeProjectId, activeChapterId: null, view: 'dashboard', focusMode: false }),
+    set({
+      activeProjectId,
+      activeChapterId: null,
+      view: 'dashboard',
+      focusMode: false,
+    }),
   setFocusMode: (focusMode) => set({ focusMode }),
   toggleFocusMode: () => set({ focusMode: !get().focusMode }),
 }));

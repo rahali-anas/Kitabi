@@ -2324,3 +2324,269 @@ button.q-brand:hover span {
 .q-journal-body .bn-block[data-content-type='journalDate'] .bn-block-outer {
   pointer-events: none;
 }
+/* ═══════════════════════════════════════════════
+   Index — presence heatmap
+   ═══════════════════════════════════════════════ */
+
+.q-index-section {
+  margin-bottom: 40px;
+}
+
+.q-index-section-head {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ink-0);
+  margin-bottom: 20px;
+}
+
+.q-index-section-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  color: var(--ink-0);
+}
+
+.q-heatmap-wrap {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.q-heatmap-grid {
+  display: grid;
+  gap: 2px;
+  align-items: center;
+  min-width: max-content;
+}
+
+.q-heatmap-corner {
+  height: 28px;
+}
+
+.q-heatmap-col-label {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  cursor: default;
+}
+
+.q-heatmap-header-total {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.q-heatmap-row-label {
+  height: 26px;
+  display: flex;
+  align-items: center;
+  padding-right: 12px;
+  font-size: 12.5px;
+  color: var(--ink-0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.q-heatmap-cell {
+  position: relative;
+  height: 26px;
+  border: 1px solid var(--line);
+  background: var(--paper-3);
+  cursor: pointer;
+  padding: 0;
+  transition: border-color var(--dur-2) var(--ease);
+  overflow: hidden;
+}
+
+.q-heatmap-cell[data-filled='true']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink-0);
+  opacity: var(--q-heat-alpha, 0.15);
+  pointer-events: none;
+}
+
+.q-heatmap-cell:hover {
+  border-color: var(--ink-0);
+}
+
+.q-heatmap-total {
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.q-heatmap-empty {
+  padding: 40px 0;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-2);
+  text-align: center;
+}
+
+.q-heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.q-heatmap-legend-label {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+.q-heatmap-legend-swatches {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.q-heatmap-legend-swatch {
+  width: 18px;
+  height: 12px;
+  background: var(--ink-0);
+  border: 1px solid var(--line);
+}
+/* Six-column variant for the Index page */
+.q-index-section .q-stats {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+@media (max-width: 900px) {
+  .q-index-section .q-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .q-index-section .q-stats .q-stat:nth-child(3n) {
+    border-right: none;
+  }
+  .q-index-section .q-stats .q-stat:nth-child(-n+3) {
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 560px) {
+  .q-index-section .q-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .q-index-section .q-stats .q-stat {
+    border-right: none;
+  }
+  .q-index-section .q-stats .q-stat:nth-child(odd) {
+    border-right: 1px solid var(--line);
+  }
+  .q-index-section .q-stats .q-stat {
+    border-bottom: 1px solid var(--line);
+  }
+  .q-index-section .q-stats .q-stat:nth-last-child(-n+2) {
+    border-bottom: none;
+  }
+}
+/* ═══════════════════════════════════════════════
+   Index — cast summary
+   ═══════════════════════════════════════════════ */
+
+.q-cast {
+  display: flex;
+  flex-direction: column;
+}
+
+.q-cast-row {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.q-cast-row:last-child {
+  border-bottom: none;
+}
+
+.q-cast-row-block {
+  align-items: flex-start;
+}
+
+.q-cast-label {
+  flex-shrink: 0;
+  width: 160px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.q-cast-value {
+  font-size: 13px;
+  color: var(--ink-0);
+  flex: 1;
+  min-width: 0;
+}
+
+.q-cast-sub {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.q-cast-unused {
+  font-style: italic;
+  color: var(--ink-2);
+  line-height: 1.65;
+}
+
+.q-cast-sep {
+  color: var(--ink-3);
+}
+
+/* ═══════════════════════════════════════════════
+   Index — health
+   ═══════════════════════════════════════════════ */
+
+.q-health {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+}
+
+.q-health-clear {
+  font-size: 13px;
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.q-health-stat {
+  font-size: 13px;
+  color: var(--ink-0);
+}
+
+.q-health-num {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.q-health-lbl {
+  color: var(--ink-2);
+}
