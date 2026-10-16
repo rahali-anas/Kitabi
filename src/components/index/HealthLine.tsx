@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, type Chapter, type Character, type Note } from '@/db/database';
+import { db } from '@/db/database';
 import { blockNoteToText } from '@/lib/search';
 
 function countWords(text: string): number {
   if (!text) return 0;
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
-
+``
 interface HealthData {
   emptyChapters: number;
   unusedCharacters: number;
