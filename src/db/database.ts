@@ -20,6 +20,7 @@ export interface Chapter {
   snapshots: { ts: number; title: string; body: string }[];
   created: number;
   updated: number;
+  journalDate?: string;
 }
 
 export interface Character {

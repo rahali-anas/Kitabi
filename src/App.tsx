@@ -12,6 +12,7 @@ import { Storylines } from '@/pages/Storylines';
 import { Notes } from '@/pages/Notes';
 import { Dashboard } from '@/pages/Dashboard';
 import { PowerSystemPage } from '@/pages/PowerSystem';
+import { Journal } from '@/pages/Journal';
 import { WelcomeScreen } from '@/components/welcome/WelcomeScreen';
 import { ProjectsModal } from '@/components/welcome/ProjectsModal';
 import { CharacterModal } from '@/components/characters/CharacterModal';
@@ -145,6 +146,8 @@ function App() {
     return <WelcomeScreen />;
   }
 
+  const isJournal = activeProject.type === 'journal';
+
   return (
     <div className="min-h-screen">
       <header className="q-topbar">
@@ -172,19 +175,21 @@ function App() {
           <span className="name">{activeProject.name}</span>
         </button>
 
-        <nav className="q-nav">
-          {NAV.filter(
-            (n) => n.key !== 'lore' || activeProject.hasPowerSystem
-          ).map((n) => (
-            <button
-              key={n.key}
-              onClick={() => setView(n.key)}
-              className={`q-nav-btn ${view === n.key ? 'active' : ''}`}
-            >
-              {n.label}
-            </button>
-          ))}
-        </nav>
+        {!isJournal && (
+          <nav className="q-nav">
+            {NAV.filter(
+              (n) => n.key !== 'lore' || activeProject.hasPowerSystem
+            ).map((n) => (
+              <button
+                key={n.key}
+                onClick={() => setView(n.key)}
+                className={`q-nav-btn ${view === n.key ? 'active' : ''}`}
+              >
+                {n.label}
+              </button>
+            ))}
+          </nav>
+        )}
 
         <div className="q-topbar-right">
           <button
@@ -212,12 +217,26 @@ function App() {
       </header>
 
       <main className="q-page q-fade" key={view}>
-        {view === 'dashboard' && <Dashboard projectId={activeProject.id} />}
-        {view === 'manuscript' && <Manuscript projectId={activeProject.id} />}
-        {view === 'characters' && <Characters projectId={activeProject.id} />}
-        {view === 'storylines' && <Storylines projectId={activeProject.id} />}
-        {view === 'notes' && <Notes projectId={activeProject.id} />}
-        {view === 'lore' && <PowerSystemPage projectId={activeProject.id} />}
+        {isJournal ? (
+          <Journal projectId={activeProject.id} />
+        ) : (
+          <>
+            {view === 'dashboard' && <Dashboard projectId={activeProject.id} />}
+            {view === 'manuscript' && (
+              <Manuscript projectId={activeProject.id} />
+            )}
+            {view === 'characters' && (
+              <Characters projectId={activeProject.id} />
+            )}
+            {view === 'storylines' && (
+              <Storylines projectId={activeProject.id} />
+            )}
+            {view === 'notes' && <Notes projectId={activeProject.id} />}
+            {view === 'lore' && (
+              <PowerSystemPage projectId={activeProject.id} />
+            )}
+          </>
+        )}
       </main>
 
       {focusMode && (

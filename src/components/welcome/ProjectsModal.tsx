@@ -79,15 +79,16 @@ export function ProjectsModal({
                 >
                   <div className="flex-1 min-w-0">
                     <div className="text-[13.5px] italic font-semibold truncate">{p.name}</div>
-                    <label className="flex items-center gap-1.5 mt-1 text-[11px] italic text-[var(--text-2)] cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={p.hasPowerSystem}
-                        onChange={(e) => void togglePowerSystem(p, e.target.checked)}
-                        className="w-3.5 h-3.5 accent-[var(--accent-1)]"
-                      />
-                      Power System
-                    </label>
+                    {p.type === 'story' && (
+                      <label className="q-project-toggle">
+                        <input
+                          type="checkbox"
+                          checked={p.hasPowerSystem}
+                          onChange={(e) => void togglePowerSystem(p, e.target.checked)}
+                        />
+                        <span>Power System</span>
+                      </label>
+                    )}
                   </div>
                   {isActive && (
                     <span className="text-[9.5px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ">

@@ -2161,3 +2161,166 @@ button.q-brand {
 button.q-brand:hover span {
   color: var(--ink-2);
 }
+/* ═══════════════════════════════════════════════
+   Journal — Modawanati
+   ═══════════════════════════════════════════════ */
+
+.q-journal {
+  position: relative;
+  min-height: calc(100vh - 60px);
+  background: var(--paper-0);
+}
+
+.q-journal-bar {
+  position: sticky;
+  top: 60px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 24px;
+  background: var(--paper-0);
+  border-bottom: 1px solid var(--line);
+}
+
+.q-journal-status {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.q-journal-status.saving {
+  color: var(--ink-1);
+}
+
+.q-journal-body {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 56px 32px 160px;
+}
+
+.q-journal-body .bn-container,
+.q-journal-body .bn-editor {
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--ink-0);
+  padding-inline: 0;
+  outline: none;
+  box-shadow: none;
+}
+
+.q-journal-body .bn-editor:focus,
+.q-journal-body .bn-editor:focus-within,
+.q-journal-body .bn-container:focus,
+.q-journal-body .bn-container:focus-within {
+  outline: none;
+  box-shadow: none;
+}
+
+
+/* ═══════════════════════════════════════════════
+   Find bar (journal)
+   ═══════════════════════════════════════════════ */
+
+.q-find {
+  position: sticky;
+  top: 60px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--paper-0);
+  border-bottom: 1px solid var(--line);
+  animation: q-fade var(--dur-2) var(--ease) both;
+}
+
+.q-find-input {
+  flex: 1;
+  max-width: 320px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-0);
+  font-family: inherit;
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color var(--dur-2) var(--ease);
+}
+
+.q-find-input:focus {
+  border-color: var(--ink-0);
+}
+
+.q-find-count {
+  font-size: 11px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  min-width: 70px;
+}
+
+.q-find-btn {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease);
+}
+
+.q-find-btn:hover:not(:disabled) {
+  color: var(--ink-0);
+  border-color: var(--ink-0);
+}
+
+.q-find-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.q-journal-count {
+  font-size: 10.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════
+   Journal date block
+   ═══════════════════════════════════════════════ */
+
+.q-journal-date {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 32px 0 16px;
+  user-select: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+.q-journal-date-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.q-journal-date-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* Remove the BlockNote drag/hover chrome on the date block */
+.q-journal-body .bn-block[data-content-type='journalDate'] .bn-block-outer {
+  pointer-events: none;
+}

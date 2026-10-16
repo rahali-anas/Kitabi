@@ -19,7 +19,7 @@ function timeAgo(ts: number): string {
 const COMING_SOON: Record<Module, string | null> = {
   story: null,
   diary: 'Modakirati is under construction. Come back soon.',
-  journal: 'Modawanati is under construction. Come back soon.',
+  journal:null,
 };
 
 export function WelcomeScreen() {
