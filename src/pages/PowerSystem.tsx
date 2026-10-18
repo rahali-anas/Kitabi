@@ -61,7 +61,7 @@ useEffect(() => {
   return (
     <div>
       <div className="flex items-center justify-between flex-wrap gap-3 mb-4 pb-3 border-b border-[var(--line)]">
-        <h2 className="text-xl font-semibold italic">Power System</h2>
+        <h2 className="q-page-title">Power System</h2>
       </div>
 
       {isEmpty ? (

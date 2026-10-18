@@ -6,11 +6,8 @@ import { BlockNoteSchema, defaultInlineContentSpecs } from '@blocknote/core';
 import { db } from '@/db/database';
 import { WikiLinkInline } from '@/lib/wikiBlockNote';
 import { useUIStore } from '@/stores/uiStore';
-import {
-  WikiPicker,
-  type WikiPickerState,
-  type WikiPickerItem,
-} from './WikiPicker';
+import { WikiPicker, type WikiPickerState, type WikiPickerItem } from './WikiPicker';
+
 
 const schema = BlockNoteSchema.create({
   inlineContentSpecs: {
@@ -88,7 +85,7 @@ function wordCount(json: string) {
       return extract(blocks).trim().split(/\s+/).filter(Boolean).length;
     }
   } catch {
-    // plain text
+    // ignore
   }
   return json.trim().split(/\s+/).filter(Boolean).length;
 }
@@ -117,8 +114,8 @@ export function ChapterEditor({ chapterId }: { chapterId: string }) {
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [picker, setPicker] = useState<WikiPickerState>(EMPTY_PICKER);
-  const saveTimer = useRef<number | null>(null);
   const titleRef = useRef('');
+  const saveTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (!chapter || loaded) return;
@@ -129,70 +126,66 @@ export function ChapterEditor({ chapterId }: { chapterId: string }) {
         const blocks = JSON.parse(chapter.body);
         editor.replaceBlocks(editor.document, migrateBlocks(blocks));
       } catch {
-        // plain text — leave empty
+        // ignore
       }
     }
     setLoaded(true);
   }, [chapter, editor, loaded]);
 
+  // Flush on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimer.current) {
+        window.clearTimeout(saveTimer.current);
+        const body = JSON.stringify(editorRef.current.document);
+        void db.chapters.update(chapterId, {
+          title: titleRef.current || 'Untitled Chapter',
+          body,
+          updated: Date.now(),
+        });
+      }
+    };
+  }, [chapterId]);
 
-  // Wiki link click → resolve name → id → dispatch open event
+  // Wiki Link click handler
   useEffect(() => {
     const handler = async (e: Event) => {
-      const detail = (e as CustomEvent).detail as {
-        kind: 'char' | 'note';
-        id: string;
-      };
+      const detail = (e as CustomEvent).detail as { kind: 'char' | 'note'; id: string };
       if (!detail?.id) return;
       const name = detail.id.toLowerCase();
       if (detail.kind === 'char') {
-        const all = await db.characters
-          .where('projectId')
-          .equals(chapter?.projectId ?? '')
-          .toArray();
+        const all = await db.characters.where('projectId').equals(chapter?.projectId ?? '').toArray();
         const match = all.find((c) => (c.name || '').toLowerCase() === name);
-        if (match) {
-          window.dispatchEvent(
-            new CustomEvent('qisati:open-character', {
-              detail: { id: match.id },
-            })
-          );
-        }
+        if (match) window.dispatchEvent(new CustomEvent('qisati:open-character', { detail: { id: match.id } }));
         return;
       }
       if (detail.kind === 'note') {
-        const all = await db.notes
-          .where('projectId')
-          .equals(chapter?.projectId ?? '')
-          .toArray();
+        const all = await db.notes.where('projectId').equals(chapter?.projectId ?? '').toArray();
         const match = all.find((n) => (n.title || '').toLowerCase() === name);
-        if (match) {
-          window.dispatchEvent(
-            new CustomEvent('qisati:open-note', { detail: { id: match.id } })
-          );
-        }
+        if (match) window.dispatchEvent(new CustomEvent('qisati:open-note', { detail: { id: match.id } }));
       }
     };
     window.addEventListener('qisati:open-wiki', handler);
     return () => window.removeEventListener('qisati:open-wiki', handler);
   }, [chapter?.projectId]);
-  // Focus a specific block when requested (e.g. from Reminders)
-    useEffect(() => {
-      const handler = (e: Event) => {
-        const detail = (e as CustomEvent).detail as { blockId: string };
-        if (!detail?.blockId) return;
-        try {
-          editor.setTextCursorPosition(detail.blockId, 'start');
-          editor.focus();
-        } catch {
-          // block no longer exists — ignore
-        }
-      };
-      window.addEventListener('qisati:focus-block', handler);
-      return () => window.removeEventListener('qisati:focus-block', handler);
-    }, [editor]);
-    
-  // ── Wiki picker: watch for [[ ─────────────────────────────
+
+  // Focus block event (reminders)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { blockId: string };
+      if (!detail?.blockId) return;
+      try {
+        editor.setTextCursorPosition(detail.blockId, 'start');
+        editor.focus();
+      } catch {
+        // ignore
+      }
+    };
+    window.addEventListener('qisati:focus-block', handler);
+    return () => window.removeEventListener('qisati:focus-block', handler);
+  }, [editor]);
+
+  // Wiki Picker trigger
   useEffect(() => {
     const check = () => {
       const state = editorRef.current.prosemirrorState;
@@ -208,7 +201,6 @@ export function ChapterEditor({ chapterId }: { chapterId: string }) {
         setPicker((p) => (p.open ? { ...p, open: false } : p));
         return;
       }
-      // Text of the current text block up to the cursor
       const start = $pos.start();
       const textBefore = state.doc.textBetween(start, pos, '\n', '\0');
       const idx = textBefore.lastIndexOf('[[');
@@ -217,22 +209,13 @@ export function ChapterEditor({ chapterId }: { chapterId: string }) {
         return;
       }
       const query = textBefore.slice(idx + 2);
-      console.log('CHECK query =', JSON.stringify(query));
-      // bails
       if (query.length > 40 || query.includes(']') || query.includes('\n') || query.includes('[')) {
         setPicker((p) => (p.open ? { ...p, open: false } : p));
         return;
       }
       const rangeStart = start + idx;
       const rangeEnd = pos;
-      setPicker({
-        open: true,
-        items: [],
-        selectedIndex: 0,
-        query,
-        rangeStart,
-        rangeEnd,
-      });
+      setPicker({ open: true, items: [], selectedIndex: 0, query, rangeStart, rangeEnd });
     };
 
     const offChange = editor.onChange(check);
@@ -243,15 +226,11 @@ export function ChapterEditor({ chapterId }: { chapterId: string }) {
     };
   }, [editor]);
 
-  // Intercept keys while picker open
+  // Keys for picker
   useEffect(() => {
     if (!picker.open) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (
-        ['ArrowDown', 'ArrowUp', 'Enter', 'Tab', 'Escape'].includes(e.key)
-      ) {
-        e.stopPropagation();
-      }
+      if (['ArrowDown', 'ArrowUp', 'Enter', 'Tab', 'Escape'].includes(e.key)) e.stopPropagation();
     };
     document.addEventListener('keydown', onKeyDown, true);
     return () => document.removeEventListener('keydown', onKeyDown, true);
@@ -263,16 +242,12 @@ export function ChapterEditor({ chapterId }: { chapterId: string }) {
     const re = picker.rangeEnd;
     if (rs == null || re == null) return;
 
-    // Delete the typed "[[query"
     try {
-      ed.transact((tr) => {
-        tr.delete(rs, re);
-      });
+      ed.transact((tr) => tr.delete(rs, re));
     } catch {
       // ignore
     }
 
-    // Insert the wikiLink node
     ed.insertInlineContent(
       [
         {
@@ -311,6 +286,11 @@ export function ChapterEditor({ chapterId }: { chapterId: string }) {
     titleRef.current = v;
     scheduleSave(v);
   };
+  const removeChapter = async () => {
+    if (!confirm('Delete this chapter? This cannot be undone.')) return;
+    await db.chapters.delete(chapterId);
+    useUIStore.getState().setActiveChapter(null);
+  };
 
   if (!chapter) return null;
 
@@ -319,29 +299,40 @@ export function ChapterEditor({ chapterId }: { chapterId: string }) {
   return (
     <div className="q-ms-editor">
       <div className="q-ms-toolbar">
-        <select
-          className="q-ms-toolbar-select"
-          value={chapter.status || 'draft'}
-          onChange={async (e) => {
-            await db.chapters.update(chapterId, {
-              status: e.target.value as any,
-            });
-          }}
-        >
-          <option value="draft">Draft</option>
-          <option value="revising">Revising</option>
-          <option value="done">Done</option>
-        </select>
-        <button
-          className="q-ms-toolbar-btn"
-          onClick={() => useUIStore.getState().setFocusMode(true)}
-          title="Focus mode (Ctrl+Shift+F)"
-        >
-          Focus
-        </button>
-        <span className={`q-ms-toolbar-save ${saving ? 'saving' : ''}`}>
-          {saving ? 'Saving…' : 'Saved'}
-        </span>
+        <div className="q-ms-toolbar-left">
+          <button
+            className="q-ms-toolbar-btn q-btn-danger"
+            onClick={removeChapter}
+            title="Delete Chapter"
+           >
+            Delete
+          </button>
+          <button
+            className="q-ms-toolbar-btn"
+            onClick={() => useUIStore.getState().setFocusMode(true)}
+            title="Focus mode (Ctrl+Shift+F)"
+          >
+            Focus
+          </button>
+          <select
+            className="q-ms-toolbar-select"
+            value={chapter.status || 'draft'}
+            onChange={async (e) => {
+              await db.chapters.update(chapterId, { status: e.target.value as any });
+            }}
+          >
+            <option value="draft">Draft</option>
+            <option value="revising">Revising</option>
+            <option value="done">Done</option>
+          </select>
+          
+          
+        </div>
+        <div className="q-ms-toolbar-right">
+          <span className={`q-ms-toolbar-save ${saving ? 'saving' : ''}`}>
+            {saving ? 'Saving…' : 'Saved'}
+          </span>
+        </div>
       </div>
 
       <input
@@ -364,19 +355,13 @@ export function ChapterEditor({ chapterId }: { chapterId: string }) {
         state={picker}
         onPick={pickItem}
         onClose={() => setPicker(EMPTY_PICKER)}
-        onSelectionChange={(idx) =>
-          setPicker((p) => ({ ...p, selectedIndex: idx }))
-        }
+        onSelectionChange={(idx) => setPicker((p) => ({ ...p, selectedIndex: idx }))}
       />
 
       <div className="q-ms-footer">
         <span />
-        <span>
-          {words.toLocaleString()} words · {readingTime(words)}
-        </span>
+        <span>{words.toLocaleString()} words · {readingTime(words)}</span>
       </div>
     </div>
   );
 }
-
-// helper no-op to keep the ref import used in dev

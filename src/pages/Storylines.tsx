@@ -3,8 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Storyline } from '@/db/database';
 import { StorylineModal } from '@/components/storylines/StorylineModal';
 import { WikiText } from '@/components/WikiText';
-import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, ChevronDown, ChevronRight } from 'lucide-react';
 
 export function Storylines({ projectId }: { projectId: string }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -36,86 +35,53 @@ export function Storylines({ projectId }: { projectId: string }) {
     setEditing(null);
     setModalOpen(true);
   };
-  const openEdit = (s: Storyline) => {
-    setEditing(s);
-    setModalOpen(true);
-  };
-  const remove = async (id: string) => {
-    if (!confirm('Delete storyline?')) return;
-    await db.storylines.delete(id);
-  };
 
   return (
     <div>
-      <div className="flex items-center justify-between flex-wrap gap-3 mb-4 pb-3 border-b border-border">
-        <h2 className="text-xl font-semibold italic flex items-center gap-2">
+      <div className="q-page-head">
+        <h2 className="q-page-title">
           Storylines
-          <span className="text-xs font-medium bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full not-italic">
-            {storylines?.length ?? 0}
-          </span>
+          <span className="count">{storylines?.length ?? 0}</span>
         </h2>
-        <Button onClick={openNew}>
+        <button className="q-btn q-btn-primary" onClick={openNew}>
           <Plus className="w-3.5 h-3.5 mr-1" /> Add Storyline
-        </Button>
+        </button>
       </div>
 
       {storylines && storylines.length === 0 && (
-        <div className="text-center py-16 text-muted-foreground italic text-sm">
+        <div className="q-file-row q-file-row-static" style={{ color: 'var(--ink-2)', fontSize: 13 }}>
           No storylines yet. Add your first one.
         </div>
       )}
 
       {storylines && storylines.length > 0 && (
-        <div className="relative pl-10">
-          <div className="absolute left-3 top-0 bottom-0 w-px bg-gradient-to-b from-primary to-transparent" />
+        <div className="flex flex-col">
           {storylines.map((s) => {
             const expanded = expandedId === s.id;
             return (
               <div
                 key={s.id}
-                className="relative mb-3 group"
+                className="q-file-row"
+                style={{ flexDirection: 'column', alignItems: 'stretch', cursor: 'pointer' }}
+                onClick={() => setExpandedId(expanded ? null : s.id)}
               >
-                <div className="absolute -left-[27px] top-[18px] w-2.5 h-2.5 rounded-full bg-primary border-2 border-background" />
-                <div
-                  onClick={() => setExpandedId(expanded ? null : s.id)}
-                  className="bg-card border border-border border-l-4 border-l-primary rounded-md px-4 py-3 cursor-pointer hover:bg-muted transition-colors"
-                >
-                  <div className="text-[10.5px] font-bold uppercase tracking-widest text-primary">
-                    {s.year || '--'}
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-baseline gap-4">
+                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-3)', letterSpacing: '0.1em', minWidth: 40 }}>
+                      {s.year || '----'}
+                    </span>
+                    <div className="q-file-title">{s.title || 'Untitled'}</div>
                   </div>
-                  <div className="text-base font-semibold italic mt-0.5">
-                    {s.title || 'Untitled'}
-                  </div>
-                  {expanded && s.description && (
-                    <div className="text-[12.5px] text-muted-foreground mt-2 leading-relaxed">
-                      <WikiText text={s.description} projectId={projectId} />
-                    </div>
-                  )}
-                  <div className="absolute top-3 right-3 hidden group-hover:flex gap-1">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-6 w-6"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEdit(s);
-                      }}
-                    >
-                      <Pencil className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-6 w-6 text-destructive hover:text-destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        remove(s.id);
-                      }}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
+                  <div className="q-file-meta">
+                    {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   </div>
                 </div>
+                
+                {expanded && s.description && (
+                  <div style={{ marginTop: 12, fontSize: 13, color: 'var(--ink-1)', lineHeight: 1.6 }}>
+                    <WikiText text={s.description} projectId={projectId} />
+                  </div>
+                )}
               </div>
             );
           })}

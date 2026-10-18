@@ -2,15 +2,7 @@ import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Note } from '@/db/database';
 import { NoteModal } from '@/components/notes/NoteModal';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Plus, Pin, Trash2 } from 'lucide-react';
+import { Plus, Pin } from 'lucide-react';
 
 function timeAgo(ts: number) {
   const m = Math.floor((Date.now() - ts) / 60000);
@@ -50,120 +42,61 @@ export function Notes({ projectId }: { projectId: string }) {
     setEditing(n);
     setModalOpen(true);
   };
-  const togglePin = async (n: Note) => {
-    await db.notes.update(n.id, { pinned: !n.pinned });
-  };
-  const remove = async (id: string) => {
-    if (!confirm('Delete note?')) return;
-    await db.notes.delete(id);
-  };
 
   return (
     <div>
-      <div className="flex items-center justify-between flex-wrap gap-3 mb-4 pb-3 border-b border-border">
-        <h2 className="text-xl font-semibold italic flex items-center gap-2">
+      <div className="q-page-head">
+        <h2 className="q-page-title">
           World Notes
-          <span className="text-xs font-medium bg-primary text-primary-foreground px-2.5 py-0.5 rounded-full not-italic">
-            {notes?.length ?? 0}
-          </span>
+          <span className="count">{notes?.length ?? 0}</span>
         </h2>
-        <Button onClick={openNew}>
+        <button className="q-btn q-btn-primary" onClick={openNew}>
           <Plus className="w-3.5 h-3.5 mr-1" /> New Note
-        </Button>
+        </button>
       </div>
 
-      <div className="flex flex-wrap gap-3 items-center bg-card border border-border border-l-4 border-l-primary rounded-md px-4 py-2.5 mb-4 text-xs">
-        <span className="font-semibold text-foreground">Filter:</span>
-        <Select value={tagFilter} onValueChange={setTagFilter}>
-          <SelectTrigger className="h-8 w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All tags</SelectItem>
-            {allTags.map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="q-filters">
+        <span className="q-filters-label">Filter</span>
+        <select value={tagFilter} onChange={(e) => setTagFilter(e.target.value)}>
+          <option value="all">All tags</option>
+          {allTags.map((t) => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
         {tagFilter !== 'all' && (
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setTagFilter('all')}
-          >
+          <button className="q-filters-clear" onClick={() => setTagFilter('all')}>
             Clear
-          </Button>
+          </button>
         )}
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground italic text-sm">
-          {notes?.length === 0
-            ? 'No notes yet.'
-            : 'No notes match this filter.'}
+        <div className="q-file-row q-file-row-static" style={{ color: 'var(--ink-2)', fontSize: 13 }}>
+          {notes?.length === 0 ? 'No notes yet.' : 'No notes match this filter.'}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="flex flex-col">
           {filtered.map((n) => (
             <div
               key={n.id}
               onClick={() => openEdit(n)}
-              className={`bg-card border rounded-md p-4 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg group relative flex flex-col min-h-[130px] ${
-                n.pinned ? 'border-primary' : 'border-border'
-              }`}
+              className="q-file-row"
             >
-              {n.pinned && (
-                <div className="absolute top-2.5 right-2.5 w-4 h-4 flex items-center justify-center text-primary">
-                  <Pin className="w-3 h-3" />
-                </div>
-              )}
-              <div className="text-[13.5px] font-semibold italic mb-1.5 pr-6">
-                {n.title || 'Untitled Note'}
-              </div>
-              <div className="text-xs text-muted-foreground line-clamp-4 whitespace-pre-wrap flex-1">
-                {n.body || ''}
-              </div>
-              {(n.tags ?? []).length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {n.tags.map((t, i) => (
-                    <span
-                      key={i}
-                      className="text-[9.5px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full italic"
-                    >
-                      {t}
+              <div className="q-file-body">
+                <div className="q-file-title">
+                  {n.title || 'Untitled Note'}
+                  {n.pinned && (
+                    <span style={{ marginLeft: 8, fontSize: 10, color: 'var(--ink-2)', display: 'inline-flex', alignItems: 'center' }}>
+                      <Pin className="w-3 h-3 mr-1" /> PINNED
                     </span>
-                  ))}
+                  )}
                 </div>
-              )}
-              <div className="flex justify-between text-[10.5px] text-muted-foreground italic mt-2.5 pt-2 border-t border-border">
-                <span>{timeAgo(n.updated)}</span>
-                <span>{n.body.split(/\s+/).filter(Boolean).length} words</span>
+                <div className="q-file-meta" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '600px' }}>
+                  {n.body || 'No content'}
+                </div>
               </div>
-              <div className="absolute top-2.5 right-2.5 hidden group-hover:flex gap-1">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-6 w-6"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePin(n);
-                  }}
-                >
-                  <Pin className="w-3 h-3" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-6 w-6 text-destructive hover:text-destructive"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    remove(n.id);
-                  }}
-                >
-                  <Trash2 className="w-3 h-3" />
-                </Button>
+              <div className="q-file-meta-right">
+                {timeAgo(n.updated)}
               </div>
             </div>
           ))}

@@ -30,7 +30,7 @@ export function Index({ projectId }: { projectId: string }) {
   const matrix = computePresence(characters, chapters);
 
   return (
-    <div className="q-page">
+    <div>
       <div className="q-page-head">
         <h2 className="q-page-title">
           Index
