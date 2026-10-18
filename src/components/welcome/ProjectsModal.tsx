@@ -3,7 +3,7 @@ import { db, type Project } from '@/db/database';
 import { useUIStore } from '@/stores/uiStore';
 import { Modal } from '@/components/ui-q/Modal';
 import { Pencil, Trash2 } from 'lucide-react';
-import { MODULES, type Module } from './BookCard';
+import type { Module } from './BookCard';
 
 const MODULE_NAMES: Record<Module, string> = {
   story: 'Qisati',
