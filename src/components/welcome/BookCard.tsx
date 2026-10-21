@@ -20,7 +20,7 @@ export const MODULES: {
   },
   {
     key: 'journal',
-    name: 'Modawanati',
+    name: 'Diftari',
     subtitle: 'Your Journal',
     newLabel: 'New Journal',
   },
