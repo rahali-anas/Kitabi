@@ -9,19 +9,19 @@ export const MODULES: {
   {
     key: 'story',
     name: 'Qisati',
-    subtitle: 'Stories, worlds, characters',
+    subtitle: 'Your Stories',
     newLabel: 'New Story',
   },
   {
     key: 'diary',
     name: 'Modakirati',
-    subtitle: 'Daily entries, memories',
+    subtitle: 'Your Diary',
     newLabel: 'New Diary',
   },
   {
     key: 'journal',
     name: 'Modawanati',
-    subtitle: 'Notes, thoughts, ideas',
+    subtitle: 'Your Journal',
     newLabel: 'New Journal',
   },
 ];

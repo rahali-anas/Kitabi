@@ -6,7 +6,10 @@ import { ArrowLeft } from 'lucide-react';
 import { Modal } from '@/components/ui-q/Modal';
 import { BookCard, MODULES, type Module } from './BookCard';
 import { NewProjectModal } from './NewProjectModal';
-
+import { WelcomeBackground } from './WelcomeBackground';
+import { useEffect} from 'react';
+import {Moon,Sun,Calendar as CalendarIcon,} 
+from 'lucide-react';
 function timeAgo(ts: number): string {
   const m = Math.floor((Date.now() - ts) / 60000);
   if (m < 1) return 'just now';
@@ -23,13 +26,18 @@ const COMING_SOON: Record<Module, string | null> = {
 };
 
 export function WelcomeScreen() {
+  const [dark, setDark] = useState(() =>
+      document.documentElement.classList.contains('dark')
+    );
+    useEffect(() => {
+      document.documentElement.classList.toggle('dark', dark);
+    }, [dark]);
   const setActiveProject = useUIStore((s) => s.setActiveProject);
   const projects = useLiveQuery(() => db.projects.toArray(), []);
   const [openModule, setOpenModule] = useState<Module | null>(null);
   const [newOpen, setNewOpen] = useState(false);
   const [newModule, setNewModule] = useState<Module>('story');
   const [comingSoon, setComingSoon] = useState<Module | null>(null);
-
   const byModule = useMemo(() => {
     const map: Record<Module, Project[]> = {
       story: [],
@@ -45,7 +53,6 @@ export function WelcomeScreen() {
     }
     return map;
   }, [projects]);
-
   const openNew = (m: Module) => {
     if (COMING_SOON[m]) {
       setComingSoon(m);
@@ -54,18 +61,37 @@ export function WelcomeScreen() {
     setNewModule(m);
     setNewOpen(true);
   };
-
-  return (
-    <div className="q-welcome">
-      <div className="q-welcome-head">
-        <div className="q-welcome-brand">
-          <img src="./logo1.png" alt="" />
-          <span>Kitabi</span>
+    return (
+      <div className="q-welcome">
+        <div className="q-topbar-right">
+          <button
+            className="q-icon-btn"
+            onClick={() => alert('Calendar coming next')}
+            title="Calendar"
+          >
+            <CalendarIcon className="w-4 h-4" />
+          </button>
+          <button
+            className="q-icon-btn"
+            onClick={() => setDark((d) => !d)}
+            title="Toggle theme"
+          >
+            {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
         </div>
-        <p className="q-welcome-sub">
-          A writing station for stories, diaries, and journals.
-        </p>
-      </div>
+
+        <WelcomeBackground />
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+          <div className="q-welcome-head">
+            <div className="q-welcome-brand">
+              <img src="./logo1.png" alt="" />
+              <span>Kitabi</span>
+            </div>
+            <p className="q-welcome-sub">
+            A writing station for stories, diaries, and journals.
+            </p>
+          </div>
+        </div>
 
       {!openModule && (
         <div className="q-book-grid">

@@ -72,10 +72,10 @@
   --paper-3: #1a1a1a;
   --paper-4: #222222;
 
-  --ink-0: #ededed;
+  --ink-0: #dddbdb;
   --ink-1: #c4c4c4;
   --ink-2: #8f8f8f;
-  --ink-3: #5c5c5c;
+  --ink-3: #f7f4f4;
 
   --line: #262626;
   --line-2: #383838;
@@ -381,7 +381,7 @@
    Welcome
    ═══════════════════════════════════════════════ */
 
-.q-welcome { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 96px 40px 96px; }
+.q-welcome {position: relative; overflow: hidden; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px 40px 96px; }
 .q-welcome-head { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 56px; animation: q-fade-up var(--dur-3) var(--ease) both; }
 .q-welcome-brand { display: flex; align-items: center; gap: 14px; font-size: 32px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 14px; color: var(--ink-0); }
 .q-welcome-brand img { width: 36px; height: 36px; object-fit: contain; }
@@ -661,11 +661,11 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
    ═══════════════════════════════════════════════ */
 
 .q-book-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; width: 100%; max-width: 1080px; margin-bottom: 32px; }
-.q-book { display: flex; flex-direction: column; gap: 14px; cursor: pointer; animation: q-fade-up var(--dur-3) var(--ease) both; }
+.q-book {display: flex; flex-direction: column; gap: 14px; cursor: pointer; animation: q-fade-up var(--dur-3) var(--ease) both; }
 .q-book-shape { position: relative; display: flex; min-height: 500px; border: 1px solid var(--line); background: var(--paper-0); transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease); }
 .q-book:hover .q-book-shape { transform: translateY(-2px); border-color: var(--ink-0); }
-.q-book-spine { width: 6px; background: var(--ink-0); flex-shrink: 0; }
-.q-book-content { flex: 1; padding: 36px 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+.q-book-spine { width: 20px; background: var(--ink-0); flex-shrink: 0; }
+.q-book-content { border:#0d0d0d solid 1px;flex: 1; padding: 36px 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
 .q-book-title { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink-0); font-style: italic; }
 .q-book-rule { width: 40px; height: 1px; background: var(--ink-3); margin: 14px 0; }
 .q-book-subtitle { font-size: 12.5px; color: var(--ink-2); line-height: 1.55; max-width: 220px; }

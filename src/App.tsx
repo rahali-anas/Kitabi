@@ -153,20 +153,24 @@ function App() {
   return (
     <div className="min-h-screen">
       <header className="q-topbar">
-        <button
-          className="q-brand"
-          onClick={() => setActiveProject(null)}
-          title="Back to library"
-        >
-          <img src="./logo.png" alt="" />
-          <span>
-            {activeProject.type === 'diary'
-              ? 'Modakirati'
-              : activeProject.type === 'journal'
-                ? 'Modawanati'
-                : 'Qisati'}
-          </span>
-        </button>
+        {(() => {
+          const type = activeProject.type || 'story';
+          const brand = type === 'diary'
+            ? { name: 'Modakirati', img: './logo2.png' }
+            : type === 'journal'
+              ? { name: 'Diftari', img: './logo3.png' }
+              : { name: 'Qisati', img: './logo.png' };
+          return (
+            <button
+              className="q-brand"
+              onClick={() => setActiveProject(null)}
+              title="Back to library"
+            >
+              <img src={brand.img} alt="" />
+              <span>{brand.name}</span>
+            </button>
+          );
+        })()}
 
         <button
           className="q-project-btn"
