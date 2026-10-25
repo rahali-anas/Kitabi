@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { db, type Storyline } from '@/db/database';
-
+import { toast } from '@/lib/toast';
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -41,7 +41,7 @@ export function StorylineModal({ open, onClose, projectId, editing }: Props) {
 
   const save = async () => {
     if (!form.title.trim() || !form.year.trim()) {
-      alert('Title and Year required.');
+      toast('Title and Year required.', 'error');
       return;
     }
     const data = {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Modal, ModalField } from '@/components/ui-q/Modal';
 import { db } from '@/db/database';
 import type { Module } from './BookCard';
-
+import { toast } from '@/lib/toast';
 const MODULE_TITLES: Record<Module, string> = {
   story: 'New Story',
   diary: 'New Diary',
@@ -33,7 +33,7 @@ export function NewProjectModal({
   const create = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
-      alert('Project name required.');
+      toast('Project name required.', 'error');
       return;
     }
     const id = crypto.randomUUID();

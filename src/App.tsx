@@ -18,8 +18,11 @@ import { ProjectsModal } from '@/components/welcome/ProjectsModal';
 import { CharacterModal } from '@/components/characters/CharacterModal';
 import { NoteModal } from '@/components/notes/NoteModal';
 import { StorylineModal } from '@/components/storylines/StorylineModal';
-import { Index } from '@/pages/Index';
 import { SearchModal } from '@/components/search/SearchModal';
+import { ConfirmModal } from '@/components/ui-q/ConfirmModal';
+import { confirmManager, type ConfirmOptions } from '@/lib/confirm';
+import { Index } from '@/pages/Index';
+import { ToastContainer } from '@/lib/toast';
 import {
   Folder,
   Moon,
@@ -103,6 +106,26 @@ function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [focusMode, toggleFocusMode, setFocusMode]);
 
+  // Universal Confirmation Modal
+  const [confirmState, setConfirmState] = useState<{
+    opts: ConfirmOptions;
+    resolve: (v: boolean) => void;
+  } | null>(null);
+
+  useEffect(() => {
+    confirmManager.register((opts, resolve) => {
+      setConfirmState({ opts, resolve });
+    });
+    return () => confirmManager.unregister();
+  }, []);
+
+  const handleConfirm = (result: boolean) => {
+    if (confirmState) {
+      confirmState.resolve(result);
+      setConfirmState(null);
+    }
+  };
+
   // Cross-view wiki-link / search → modal hosts
   const [wikiChar, setWikiChar] = useState<CharRow | null>(null);
   const [wikiNote, setWikiNote] = useState<NoteRow | null>(null);
@@ -149,28 +172,25 @@ function App() {
   }
 
   const isJournal = activeProject.type === 'journal';
+  const isDiary = activeProject.type === 'diary';
 
   return (
     <div className="min-h-screen">
       <header className="q-topbar">
-        {(() => {
-          const type = activeProject.type || 'story';
-          const brand = type === 'diary'
-            ? { name: 'Modakirati', img: './logo2.png' }
-            : type === 'journal'
-              ? { name: 'Diftari', img: './logo3.png' }
-              : { name: 'Qisati', img: './logo.png' };
-          return (
-            <button
-              className="q-brand"
-              onClick={() => setActiveProject(null)}
-              title="Back to library"
-            >
-              <img src={brand.img} alt="" />
-              <span>{brand.name}</span>
-            </button>
-          );
-        })()}
+        <button
+          className="q-brand"
+          onClick={() => setActiveProject(null)}
+          title="Back to library"
+        >
+          <img src="./logo.png" alt="" />
+          <span>
+            {isDiary
+              ? 'Modakirati'
+              : isJournal
+                ? 'Modawanati'
+                : 'Qisati'}
+          </span>
+        </button>
 
         <button
           className="q-project-btn"
@@ -228,12 +248,22 @@ function App() {
         ) : (
           <>
             {view === 'dashboard' && <Dashboard projectId={activeProject.id} />}
-            {view === 'manuscript' && (<Manuscript projectId={activeProject.id} />)}
-            {view === 'characters' && (<Characters projectId={activeProject.id} />)}
-            {view === 'storylines' && (<Storylines projectId={activeProject.id} />)}
+            {view === 'manuscript' && (
+              <Manuscript projectId={activeProject.id} />
+            )}
+            {view === 'characters' && (
+              <Characters projectId={activeProject.id} />
+            )}
+            {view === 'storylines' && (
+              <Storylines projectId={activeProject.id} />
+            )}
             {view === 'notes' && <Notes projectId={activeProject.id} />}
-            {view === 'index' && <Index projectId={activeProject.id} />}
-            {view === 'lore' && (<PowerSystemPage projectId={activeProject.id} />)}
+            {view === 'index' && (
+              <Index projectId={activeProject.id} />
+            )}
+            {view === 'lore' && (
+              <PowerSystemPage projectId={activeProject.id} />
+            )}
           </>
         )}
       </main>
@@ -276,6 +306,16 @@ function App() {
         onClose={() => setSearchOpen(false)}
         projectId={activeProject.id}
       />
+
+      <ConfirmModal
+        open={!!confirmState}
+        title={confirmState?.opts.title || ''}
+        message={confirmState?.opts.message || ''}
+        confirmLabel={confirmState?.opts.confirmLabel || 'Confirm'}
+        onConfirm={() => handleConfirm(true)}
+        onCancel={() => handleConfirm(false)}
+      />
+            <ToastContainer />
     </div>
   );
 }

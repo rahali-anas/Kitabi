@@ -2,14 +2,12 @@ import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Project } from '@/db/database';
 import { useUIStore } from '@/stores/uiStore';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import { Modal } from '@/components/ui-q/Modal';
 import { BookCard, MODULES, type Module } from './BookCard';
 import { NewProjectModal } from './NewProjectModal';
-import { WelcomeBackground } from './WelcomeBackground';
-import { useEffect} from 'react';
-import {Moon,Sun,Calendar as CalendarIcon,} 
-from 'lucide-react';
+import { confirmManager } from '@/lib/confirm';
+
 function timeAgo(ts: number): string {
   const m = Math.floor((Date.now() - ts) / 60000);
   if (m < 1) return 'just now';
@@ -22,22 +20,22 @@ function timeAgo(ts: number): string {
 const COMING_SOON: Record<Module, string | null> = {
   story: null,
   diary: 'Modakirati is under construction. Come back soon.',
-  journal:null,
+  journal: null,
 };
 
 export function WelcomeScreen() {
-  const [dark, setDark] = useState(() =>
-      document.documentElement.classList.contains('dark')
-    );
-    useEffect(() => {
-      document.documentElement.classList.toggle('dark', dark);
-    }, [dark]);
   const setActiveProject = useUIStore((s) => s.setActiveProject);
   const projects = useLiveQuery(() => db.projects.toArray(), []);
+  
   const [openModule, setOpenModule] = useState<Module | null>(null);
   const [newOpen, setNewOpen] = useState(false);
   const [newModule, setNewModule] = useState<Module>('story');
   const [comingSoon, setComingSoon] = useState<Module | null>(null);
+  
+  // Renaming state
+  const [renameTarget, setRenameTarget] = useState<Project | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+
   const byModule = useMemo(() => {
     const map: Record<Module, Project[]> = {
       story: [],
@@ -53,6 +51,7 @@ export function WelcomeScreen() {
     }
     return map;
   }, [projects]);
+
   const openNew = (m: Module) => {
     if (COMING_SOON[m]) {
       setComingSoon(m);
@@ -61,37 +60,44 @@ export function WelcomeScreen() {
     setNewModule(m);
     setNewOpen(true);
   };
-    return (
-      <div className="q-welcome">
-        <div className="q-topbar-right">
-          <button
-            className="q-icon-btn"
-            onClick={() => alert('Calendar coming next')}
-            title="Calendar"
-          >
-            <CalendarIcon className="w-4 h-4" />
-          </button>
-          <button
-            className="q-icon-btn"
-            onClick={() => setDark((d) => !d)}
-            title="Toggle theme"
-          >
-            {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-        </div>
 
-        <WelcomeBackground />
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-          <div className="q-welcome-head">
-            <div className="q-welcome-brand">
-              <img src="./logo1.png" alt="" />
-              <span>Kitabi</span>
-            </div>
-            <p className="q-welcome-sub">
-            A writing station for stories, diaries, and journals.
-            </p>
-          </div>
+  const handleRename = async () => {
+    if (!renameTarget || !renameValue.trim()) return;
+    await db.projects.update(renameTarget.id, { 
+      name: renameValue.trim(), 
+      updatedAt: Date.now() 
+    });
+    setRenameTarget(null);
+  };
+
+  const handleDelete = async (p: Project) => {
+    const ok = await confirmManager.confirm({
+      title: 'Delete Project',
+      message: `Are you sure you want to delete "${p.name}"? This action cannot be undone.`,
+      confirmLabel: 'Delete',
+    });
+    if (!ok) return;
+
+    await db.chapters.where('projectId').equals(p.id).delete();
+    await db.characters.where('projectId').equals(p.id).delete();
+    await db.storylines.where('projectId').equals(p.id).delete();
+    await db.notes.where('projectId').equals(p.id).delete();
+    await db.powerSystems.where('projectId').equals(p.id).delete();
+    await db.journalEntries.where('projectId').equals(p.id).delete();
+    await db.projects.delete(p.id);
+  };
+
+  return (
+    <div className="q-welcome">
+      <div className="q-welcome-head">
+        <div className="q-welcome-brand">
+          <img src="./logo.png" alt="" />
+          <span>Kitabi</span>
         </div>
+        <p className="q-welcome-sub">
+          A writing station for stories, diaries, and journals.
+        </p>
+      </div>
 
       {!openModule && (
         <div className="q-book-grid">
@@ -134,16 +140,41 @@ export function WelcomeScreen() {
           ) : (
             <div className="q-module-list">
               {byModule[openModule].map((p) => (
-                <button
+                <div
                   key={p.id}
                   className="q-module-row"
                   onClick={() => setActiveProject(p.id)}
                 >
                   <div className="q-module-row-name">{p.name}</div>
-                  <div className="q-module-row-meta">
-                    updated {timeAgo(p.updatedAt)}
+                  <div className="flex items-center gap-4">
+                    <div className="q-module-row-meta">
+                      updated {timeAgo(p.updatedAt)}
+                    </div>
+                    <div className="q-module-actions">
+                      <button
+                        className="q-icon-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setRenameTarget(p);
+                          setRenameValue(p.name);
+                        }}
+                        title="Rename"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        className="q-icon-btn text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          void handleDelete(p);
+                        }}
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           )}
@@ -174,15 +205,39 @@ export function WelcomeScreen() {
           </button>
         }
       >
-        <p
-          style={{
-            fontSize: 13,
-            color: 'var(--ink-1)',
-            lineHeight: 1.6,
-          }}
-        >
+        <p style={{ fontSize: 13, color: 'var(--ink-1)', lineHeight: 1.6 }}>
           {comingSoon && COMING_SOON[comingSoon]}
         </p>
+      </Modal>
+
+      <Modal
+        open={!!renameTarget}
+        onClose={() => setRenameTarget(null)}
+        title="Rename Project"
+        maxWidth={400}
+        footer={
+          <>
+            <button className="q-btn q-btn-ghost" onClick={() => setRenameTarget(null)}>
+              Cancel
+            </button>
+            <button className="q-btn q-btn-primary" onClick={handleRename}>
+              Save
+            </button>
+          </>
+        }
+      >
+        <div className="q-field">
+          <label className="q-field-label">Project Name</label>
+          <input
+            className="q-input"
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleRename();
+            }}
+            autoFocus
+          />
+        </div>
       </Modal>
     </div>
   );

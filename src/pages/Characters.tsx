@@ -5,6 +5,7 @@ import { CharacterCard } from '@/components/characters/CharacterCard';
 import { CharacterModal } from '@/components/characters/CharacterModal';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { confirmManager } from '@/lib/confirm';
 
 export function Characters({ projectId }: { projectId: string }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -44,10 +45,16 @@ export function Characters({ projectId }: { projectId: string }) {
     setEditing(c);
     setModalOpen(true);
   };
+  
   const remove = async (id: string) => {
-    if (!confirm('Delete character?')) return;
-    await db.characters.delete(id);
-  };
+  const ok = await confirmManager.confirm({
+    title: 'Delete Character',
+    message: 'Are you sure you want to delete this character?',
+    confirmLabel: 'Delete',
+  });
+  if (!ok) return;
+  await db.characters.delete(id);
+};  
 
   const clearFilters = () => {
     setFilterSex('all');

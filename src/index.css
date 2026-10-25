@@ -368,7 +368,7 @@
 .q-person-powers { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
 .q-person-power { font-size: 10.5px; padding: 2px 8px; border: 1px solid var(--line-2); color: var(--ink-1); white-space: nowrap; }
 .q-person-powers-empty { font-size: 11px; color: var(--ink-3); font-style: italic; margin-top: 6px; }
-.q-person-actions { display: flex; gap: 4px; flex-shrink: 0; opacity: 0; transition: opacity var(--dur-2) var(--ease); }
+.q-person-actions { display: flex; gap: 4px; flex-shrink: 0; transition: opacity var(--dur-2) var(--ease); }
 .q-person-row:hover .q-person-actions { opacity: 1; }
 .q-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); margin-bottom: 0; font-size: 12px; }
 .q-filters-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600; color: var(--ink-2); }
@@ -681,7 +681,8 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
 .q-module-title { flex: 1; font-size: 22px; font-weight: 600; font-style: italic; letter-spacing: -0.005em; color: var(--ink-0); }
 .q-module-list { display: flex; flex-direction: column; }
 .q-module-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; border: none; border-bottom: 1px solid var(--line); background: transparent; text-align: left; cursor: pointer; font-family: inherit; transition: background var(--dur-2) var(--ease), padding-left var(--dur-2) var(--ease); }
-.q-module-row:hover { background: var(--paper-3); padding-left: 10px; }
+.q-module-actions {display: flex; gap: 4px;transition: opacity var(--dur-2) var(--ease);}
+.q-module-row:hover .q-module-actions {opacity: 1;}
 .q-module-row-name { font-size: 15px; font-weight: 500; color: var(--ink-0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .q-module-row-meta { font-size: 11.5px; color: var(--ink-2); flex-shrink: 0; }
 .q-module-empty { padding: 40px 0; text-align: center; font-size: 13px; color: var(--ink-2); font-style: italic; }
@@ -690,27 +691,98 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
    Journal
    ═══════════════════════════════════════════════ */
 
-.q-journal { position: relative; min-height: calc(100vh - 60px); background: var(--paper-0); }
-.q-journal-bar { position: sticky; top: 60px; z-index: 10; display: flex; justify-content: space-between; padding: 8px 24px; background: var(--paper-0); border-bottom: 1px solid var(--line); }
-.q-journal-status { font-size: 10.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.q-journal-status.saving { color: var(--ink-1); }
-.q-journal-body { max-width: 680px; margin: 0 auto; padding: 56px 32px 160px; }
-.q-journal-body .bn-container, .q-journal-body .bn-editor { background: transparent; font-family: var(--font-body); font-size: 16px; line-height: 1.85; color: var(--ink-0); padding-inline: 0; outline: none; box-shadow: none; }
-.q-journal-body .bn-editor:focus, .q-journal-body .bn-editor:focus-within, .q-journal-body .bn-container:focus, .q-journal-body .bn-container:focus-within { outline: none; box-shadow: none; }
+.q-journal {
+  position: relative;
+  min-height: calc(100vh - 60px);
+  background: var(--paper-0);
+  padding-bottom: 120px;
+}
 
-.q-find { position: sticky; top: 60px; z-index: 30; display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--paper-0); border-bottom: 1px solid var(--line); animation: q-fade var(--dur-2) var(--ease) both; }
-.q-find-input { flex: 1; max-width: 320px; padding: 5px 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-0); font-family: inherit; font-size: 12.5px; outline: none; transition: border-color var(--dur-2) var(--ease); }
-.q-find-input:focus { border-color: var(--ink-0); }
-.q-find-count { font-size: 11px; color: var(--ink-2); font-variant-numeric: tabular-nums; min-width: 70px; }
-.q-find-btn { width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); background: transparent; color: var(--ink-2); font-size: 14px; font-family: inherit; cursor: pointer; transition: color var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease); }
-.q-find-btn:hover:not(:disabled) { color: var(--ink-0); border-color: var(--ink-0); }
-.q-find-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.q-journal-count { font-size: 10.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.q-journal-date { display: flex; align-items: center; gap: 14px; padding: 32px 0 16px; user-select: none; cursor: default; pointer-events: none; }
-.q-journal-date-rule { flex: 1; height: 1px; background: var(--line); }
-.q-journal-date-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600; color: var(--ink-3); white-space: nowrap; }
-.q-journal-body .bn-block[data-content-type='journalDate'] .bn-block-outer { pointer-events: none; }
+.q-journal-feed {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
 
+.q-journal-entry-section {
+  margin-bottom: 80px;
+}
+
+.q-journal-bar {
+  position: sticky;
+  top: 60px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 24px;
+  background: var(--paper-0);
+  border-bottom: 1px solid var(--line);
+}
+
+.q-journal-status {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.q-journal-status.saving {
+  color: var(--ink-1);
+}
+
+.q-journal-count {
+  font-size: 10.5px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.q-journal-body {
+  padding: 40px 0;
+}
+
+.q-journal-body .bn-container,
+.q-journal-body .bn-editor {
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--ink-0);
+  padding-inline: 0;
+  outline: none;
+  box-shadow: none;
+}
+
+.q-journal-body .bn-editor:focus,
+.q-journal-body .bn-editor:focus-within,
+.q-journal-body .bn-container:focus,
+.q-journal-body .bn-container:focus-within {
+  outline: none;
+  box-shadow: none;
+}
+
+.q-journal-date {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 0 24px;
+  user-select: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+.q-journal-date-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.q-journal-date-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
 /* ═══════════════════════════════════════════════
    Index
    ═══════════════════════════════════════════════ */
@@ -793,4 +865,39 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
   }
+}
+/* ═══════════════════════════════════════════════
+   Toasts
+   ═══════════════════════════════════════════════ */
+
+.q-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.q-toast {
+  background: var(--paper-0);
+  border: 1px solid var(--ink-0);
+  padding: 10px 16px;
+  font-size: 12.5px;
+  color: var(--ink-0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  animation: q-fade-up var(--dur-3) var(--ease) both;
+  pointer-events: auto;
+}
+
+.q-toast-error {
+  border-color: #a8323c;
+  color: #a8323c;
+}
+
+.dark .q-toast-error {
+  border-color: #d18a9d;
+  color: #d18a9d;
 }

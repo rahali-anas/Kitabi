@@ -92,6 +92,15 @@ export interface PowerSystem {
   notes: string[];
   updated: number;
 }
+
+export interface JournalEntry {
+  id: string;
+  projectId: string;
+  date: string; // YYYY-MM-DD
+  body: string; // BlockNote JSON
+  updated: number;
+}
+
 export class StoryDatabase extends Dexie {
   projects!: Table<Project, string>;
   chapters!: Table<Chapter, string>;
@@ -100,9 +109,12 @@ export class StoryDatabase extends Dexie {
   notes!: Table<Note, string>;
   media!: Table<MediaAsset, string>;
   powerSystems!: Table<PowerSystem, string>;
+  journalEntries!: Table<JournalEntry, string>;
 
   constructor() {
+    // ONLY CALL THIS ONCE
     super('StoryWorkstation');
+    
     this.version(1).stores({
       projects: 'id, name, updatedAt',
       chapters: 'id, projectId, order, updatedAt',
@@ -111,6 +123,7 @@ export class StoryDatabase extends Dexie {
       notes: 'id, projectId, updatedAt',
       media: 'id, projectId, type',
     });
+    
     this.version(2).stores({
       projects: 'id, name, updatedAt',
       chapters: 'id, projectId, order, updatedAt',
@@ -120,25 +133,36 @@ export class StoryDatabase extends Dexie {
       media: 'id, projectId, type',
       powerSystems: 'id, projectId',
     });
-      this.version(3)
-        .stores({
-          projects: 'id, name, updatedAt, type',
-          chapters: 'id, projectId, order, updatedAt',
-          characters: 'id, projectId, name',
-          storylines: 'id, projectId, year',
-          notes: 'id, projectId, updatedAt',
-          media: 'id, projectId, type',
-          powerSystems: 'id, projectId',
-        })
-        .upgrade(async (tx) => {
-          // Wipe old rows — test data, safe to drop.
-          await tx.table('chapters').clear();
-          await tx.table('characters').clear();
-          await tx.table('storylines').clear();
-          await tx.table('notes').clear();
-          await tx.table('powerSystems').clear();
-          await tx.table('projects').clear();
+    
+    this.version(3)
+      .stores({
+        projects: 'id, name, updatedAt, type',
+        chapters: 'id, projectId, order, updatedAt',
+        characters: 'id, projectId, name',
+        storylines: 'id, projectId, year',
+        notes: 'id, projectId, updatedAt',
+        media: 'id, projectId, type',
+        powerSystems: 'id, projectId',
+      })
+      .upgrade(async (tx) => {
+        await tx.table('chapters').clear();
+        await tx.table('characters').clear();
+        await tx.table('storylines').clear();
+        await tx.table('notes').clear();
+        await tx.table('powerSystems').clear();
+        await tx.table('projects').clear();
       });
+
+    this.version(4).stores({
+      projects: 'id, name, updatedAt, type',
+      chapters: 'id, projectId, order, updatedAt',
+      characters: 'id, projectId, name',
+      storylines: 'id, projectId, year',
+      notes: 'id, projectId, updatedAt',
+      media: 'id, projectId, type',
+      powerSystems: 'id, projectId',
+      journalEntries: 'id, projectId, date',
+    });
   }
 }
 

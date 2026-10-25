@@ -7,7 +7,7 @@ import { db } from '@/db/database';
 import { WikiLinkInline } from '@/lib/wikiBlockNote';
 import { useUIStore } from '@/stores/uiStore';
 import { WikiPicker, type WikiPickerState, type WikiPickerItem } from './WikiPicker';
-
+import { confirmManager } from '@/lib/confirm';
 
 const schema = BlockNoteSchema.create({
   inlineContentSpecs: {
@@ -287,10 +287,16 @@ export function ChapterEditor({ chapterId }: { chapterId: string }) {
     scheduleSave(v);
   };
   const removeChapter = async () => {
-    if (!confirm('Delete this chapter? This cannot be undone.')) return;
-    await db.chapters.delete(chapterId);
-    useUIStore.getState().setActiveChapter(null);
-  };
+  const ok = await confirmManager.confirm({
+    title: 'Delete Chapter',
+    message: 'Are you sure you want to delete this chapter? This cannot be undone.',
+    confirmLabel: 'Delete',
+  });
+  if (!ok) return;
+  
+  await db.chapters.delete(chapterId);
+  useUIStore.getState().setActiveChapter(null);
+};
 
   if (!chapter) return null;
 

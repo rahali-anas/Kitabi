@@ -12,7 +12,8 @@ import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import { Plus, Pencil, Trash2, Sparkles } from 'lucide-react';
-
+import { toast } from '@/lib/toast';
+import { confirmManager } from '@/lib/confirm';
 const DEFAULT_COLOR = '#7d2734';
 
 const emptySystem = (projectId: string): PowerSystem => ({
@@ -232,8 +233,13 @@ function PowerEditorModal({
     setTemp((t) => ({ ...t, categories: [...t.categories, cat] }));
   };
 
-  const removeCategory = (id: string) => {
-    if (!confirm('Delete?')) return;
+  const removeCategory = async (id: string) => {
+  const ok = await confirmManager.confirm({
+      title: 'Delete Category',
+      message: 'Delete this category and all its entries?',
+      confirmLabel: 'Delete',
+    });
+    if (!ok) return;
     setTemp((t) => ({ ...t, categories: t.categories.filter((c) => c.id !== id) }));
   };
 
@@ -290,7 +296,7 @@ function PowerEditorModal({
       projectId,
     };
     if (!clean.systemName) {
-      alert('System name required.');
+      toast('System name required.', 'error');
       return;
     }
     onSave(clean);

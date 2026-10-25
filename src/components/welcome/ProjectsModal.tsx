@@ -4,6 +4,8 @@ import { useUIStore } from '@/stores/uiStore';
 import { Modal } from '@/components/ui-q/Modal';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { Module } from './BookCard';
+import { toast } from '@/lib/toast';
+import { confirmManager } from '@/lib/confirm';
 
 const MODULE_NAMES: Record<Module, string> = {
   story: 'Qisati',
@@ -43,10 +45,15 @@ export function ProjectsModal({
   const remove = async (e: React.MouseEvent, p: Project) => {
     e.stopPropagation();
     if (!canDelete) {
-      alert('Cannot delete the last project.');
+      toast('Cannot delete the last project.', 'error');
       return;
     }
-    if (!confirm(`Delete "${p.name}"?`)) return;
+    const ok = await confirmManager.confirm({
+      title: 'Delete Project',
+      message: `Delete "${p.name}" and all its contents?`,
+      confirmLabel: 'Delete',
+    });
+    if (!ok) return;
 
     // Perform deletion
     await db.chapters.where('projectId').equals(p.id).delete();

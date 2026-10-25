@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { db, type Note } from '@/db/database';
-
+import { toast } from '@/lib/toast';
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -49,7 +49,7 @@ export function NoteModal({ open, onClose, projectId, editing }: Props) {
 
   const save = async () => {
     if (!form.title.trim()) {
-      alert('Title required.');
+      toast('Title required.', 'error');
       return;
     }
     const now = Date.now();

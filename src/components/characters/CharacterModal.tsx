@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { db, type Character } from '@/db/database';
+import { toast } from '@/lib/toast';
 
 interface Props {
   open: boolean;
@@ -72,7 +73,7 @@ export function CharacterModal({ open, onClose, projectId, editing }: Props) {
 
   const save = async () => {
     if (!form.name.trim() || !form.race.trim() || !form.sex) {
-      alert('Fill Name, Race, Sex.');
+      toast('Fill Name, Race, Sex.', 'error');
       return;
     }
     const data = {

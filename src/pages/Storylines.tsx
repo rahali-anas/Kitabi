@@ -3,7 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Storyline } from '@/db/database';
 import { StorylineModal } from '@/components/storylines/StorylineModal';
 import { WikiText } from '@/components/WikiText';
-import { Plus, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
+import { confirmManager } from '@/lib/confirm';
 
 export function Storylines({ projectId }: { projectId: string }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -36,8 +37,19 @@ export function Storylines({ projectId }: { projectId: string }) {
     setModalOpen(true);
   };
 
+  const remove = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    const ok = await confirmManager.confirm({
+      title: 'Delete Storyline',
+      message: 'Are you sure you want to delete this storyline? This cannot be undone.',
+      confirmLabel: 'Delete',
+    });
+    if (!ok) return;
+    await db.storylines.delete(id);
+  };
+
   return (
-    <div>
+    <div className="q-page">
       <div className="q-page-head">
         <h2 className="q-page-title">
           Storylines
@@ -61,7 +73,7 @@ export function Storylines({ projectId }: { projectId: string }) {
             return (
               <div
                 key={s.id}
-                className="q-file-row"
+                className="q-file-row group"
                 style={{ flexDirection: 'column', alignItems: 'stretch', cursor: 'pointer' }}
                 onClick={() => setExpandedId(expanded ? null : s.id)}
               >
@@ -72,8 +84,18 @@ export function Storylines({ projectId }: { projectId: string }) {
                     </span>
                     <div className="q-file-title">{s.title || 'Untitled'}</div>
                   </div>
-                  <div className="q-file-meta">
-                    {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  
+                  <div className="flex items-center gap-4">
+                    <button
+                      className="q-icon-btn text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => remove(e, s.id)}
+                      title="Delete Storyline"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                    <div className="q-file-meta" style={{ width: 16, display: 'flex', justifyContent: 'center' }}>
+                      {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                    </div>
                   </div>
                 </div>
                 

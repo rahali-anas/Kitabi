@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Note } from '@/db/database';
 import { NoteModal } from '@/components/notes/NoteModal';
 import { Plus, Pin } from 'lucide-react';
+import { confirmManager } from '@/lib/confirm';
 
 function timeAgo(ts: number) {
   const m = Math.floor((Date.now() - ts) / 60000);
@@ -43,8 +44,19 @@ export function Notes({ projectId }: { projectId: string }) {
     setModalOpen(true);
   };
 
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    const ok = await confirmManager.confirm({
+      title: 'Delete Note',
+      message: 'Are you sure you want to delete this note? This cannot be undone.',
+      confirmLabel: 'Delete',
+    });
+    if (!ok) return;
+    await db.notes.delete(id);
+  };
+
   return (
-    <div>
+    <div className="q-page">
       <div className="q-page-head">
         <h2 className="q-page-title">
           World Notes
@@ -80,7 +92,7 @@ export function Notes({ projectId }: { projectId: string }) {
             <div
               key={n.id}
               onClick={() => openEdit(n)}
-              className="q-file-row"
+              className="q-file-row group"
             >
               <div className="q-file-body">
                 <div className="q-file-title">
@@ -95,8 +107,15 @@ export function Notes({ projectId }: { projectId: string }) {
                   {n.body || 'No content'}
                 </div>
               </div>
-              <div className="q-file-meta-right">
-                {timeAgo(n.updated)}
+              <div className="q-file-meta-right flex items-center gap-4">
+                <span>{timeAgo(n.updated)}</span>
+                <button
+                  className="q-person-actions q-icon-btn"
+                  onClick={(e) => handleDelete(e, n.id)}
+                  title="Delete Note"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
               </div>
             </div>
           ))}
