@@ -156,15 +156,41 @@ function App() {
     };
   }, []);
 
+  // --- RENDER LOGIC ---
+
+  const globalModals = (
+    <>
+      <ConfirmModal
+        open={!!confirmState}
+        title={confirmState?.opts.title || ''}
+        message={confirmState?.opts.message || ''}
+        confirmLabel={confirmState?.opts.confirmLabel || 'Confirm'}
+        onConfirm={() => handleConfirm(true)}
+        onCancel={() => handleConfirm(false)}
+      />
+      <ToastContainer />
+    </>
+  );
+
   if (!activeProjectId) {
-    return <WelcomeScreen />;
+    return (
+      <>
+        <WelcomeScreen />
+        {globalModals}
+      </>
+    );
   }
 
   const activeProject = projects?.find((p) => p.id === activeProjectId);
   if (!activeProject) {
     if (projects === undefined) return null;
     setActiveProject(null);
-    return <WelcomeScreen />;
+    return (
+      <>
+        <WelcomeScreen />
+        {globalModals}
+      </>
+    );
   }
 
   const isJournal = activeProject.type === 'journal';
@@ -180,14 +206,14 @@ function App() {
         >
           <img 
             src={
-              isDiary ? './logo2.png' 
-              : isJournal ? './logo3.png' 
-              : './logo.png'
+              isDiary ? './modakirati.png' 
+              : isJournal ? './modawanati.png' 
+              : './qisati.png'
             } 
             alt="" 
           />
           <span>
-            {isDiary ? 'Modakirati' : isJournal ? 'Diftari' : 'Qisati'}
+            {isDiary ? 'Modakirati' : isJournal ? 'Modawanati' : 'Qisati'}
           </span>
         </button>
 
@@ -306,16 +332,7 @@ function App() {
         projectId={activeProject.id}
       />
 
-      <ConfirmModal
-        open={!!confirmState}
-        title={confirmState?.opts.title || ''}
-        message={confirmState?.opts.message || ''}
-        confirmLabel={confirmState?.opts.confirmLabel || 'Confirm'}
-        onConfirm={() => handleConfirm(true)}
-        onCancel={() => handleConfirm(false)}
-      />
-
-      <ToastContainer />
+      {globalModals}
     </div>
   );
 }
