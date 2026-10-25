@@ -13,6 +13,7 @@ import { Notes } from '@/pages/Notes';
 import { Dashboard } from '@/pages/Dashboard';
 import { PowerSystemPage } from '@/pages/PowerSystem';
 import { Journal } from '@/pages/Journal';
+import { Index } from '@/pages/Index';
 import { WelcomeScreen } from '@/components/welcome/WelcomeScreen';
 import { ProjectsModal } from '@/components/welcome/ProjectsModal';
 import { CharacterModal } from '@/components/characters/CharacterModal';
@@ -21,7 +22,6 @@ import { StorylineModal } from '@/components/storylines/StorylineModal';
 import { SearchModal } from '@/components/search/SearchModal';
 import { ConfirmModal } from '@/components/ui-q/ConfirmModal';
 import { confirmManager, type ConfirmOptions } from '@/lib/confirm';
-import { Index } from '@/pages/Index';
 import { ToastContainer } from '@/lib/toast';
 import {
   Folder,
@@ -50,17 +50,13 @@ function App() {
     focusMode,
     setFocusMode,
     toggleFocusMode,
+    theme,
+    toggleTheme,
   } = useUIStore();
+  
   const projects = useLiveQuery(() => db.projects.toArray(), []);
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-
-  const [dark, setDark] = useState(() =>
-    document.documentElement.classList.contains('dark')
-  );
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark);
-  }, [dark]);
 
   // Seed a project on first run
   useEffect(() => {
@@ -182,13 +178,16 @@ function App() {
           onClick={() => setActiveProject(null)}
           title="Back to library"
         >
-          <img src="./logo.png" alt="" />
+          <img 
+            src={
+              isDiary ? './logo2.png' 
+              : isJournal ? './logo3.png' 
+              : './logo.png'
+            } 
+            alt="" 
+          />
           <span>
-            {isDiary
-              ? 'Modakirati'
-              : isJournal
-                ? 'Modawanati'
-                : 'Qisati'}
+            {isDiary ? 'Modakirati' : isJournal ? 'Diftari' : 'Qisati'}
           </span>
         </button>
 
@@ -234,10 +233,10 @@ function App() {
           </button>
           <button
             className="q-icon-btn"
-            onClick={() => setDark((d) => !d)}
+            onClick={toggleTheme}
             title="Toggle theme"
           >
-            {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
         </div>
       </header>
@@ -315,7 +314,8 @@ function App() {
         onConfirm={() => handleConfirm(true)}
         onCancel={() => handleConfirm(false)}
       />
-            <ToastContainer />
+
+      <ToastContainer />
     </div>
   );
 }

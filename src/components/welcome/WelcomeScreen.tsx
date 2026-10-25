@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Project } from '@/db/database';
 import { useUIStore } from '@/stores/uiStore';
-import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2, Moon, Sun, Calendar as CalendarIcon } from 'lucide-react';
 import { Modal } from '@/components/ui-q/Modal';
 import { BookCard, MODULES, type Module } from './BookCard';
 import { NewProjectModal } from './NewProjectModal';
+import { WelcomeBackground } from './WelcomeBackground';
 import { confirmManager } from '@/lib/confirm';
 
 function timeAgo(ts: number): string {
@@ -25,6 +26,8 @@ const COMING_SOON: Record<Module, string | null> = {
 
 export function WelcomeScreen() {
   const setActiveProject = useUIStore((s) => s.setActiveProject);
+  const { theme, toggleTheme } = useUIStore();
+  
   const projects = useLiveQuery(() => db.projects.toArray(), []);
   
   const [openModule, setOpenModule] = useState<Module | null>(null);
@@ -32,7 +35,6 @@ export function WelcomeScreen() {
   const [newModule, setNewModule] = useState<Module>('story');
   const [comingSoon, setComingSoon] = useState<Module | null>(null);
   
-  // Renaming state
   const [renameTarget, setRenameTarget] = useState<Project | null>(null);
   const [renameValue, setRenameValue] = useState('');
 
@@ -89,97 +91,123 @@ export function WelcomeScreen() {
 
   return (
     <div className="q-welcome">
-      <div className="q-welcome-head">
-        <div className="q-welcome-brand">
-          <img src="./logo.png" alt="" />
-          <span>Kitabi</span>
-        </div>
-        <p className="q-welcome-sub">
-          A writing station for stories, diaries, and journals.
-        </p>
-      </div>
+      <WelcomeBackground />
+      
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+        
+        {/* Top-right controls */}
+        <div className='q-topbar-right'>
+          <button
+            className="q-icon-btn"
+            onClick={() => alert('Calendar coming next')}
+            title="Calendar"
+          >
+            <CalendarIcon className="w-4 h-4" />
+          </button>
 
-      {!openModule && (
-        <div className="q-book-grid">
-          {MODULES.map((m) => (
-            <BookCard
-              key={m.key}
-              module={m}
-              count={byModule[m.key].length}
-              onOpen={() => setOpenModule(m.key)}
-              onNew={() => openNew(m.key)}
-            />
-          ))}
+          <button
+            className="q-icon-btn"
+            onClick={toggleTheme}
+            title="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          
         </div>
-      )}
 
-      {openModule && (
-        <div className="q-module-view">
-          <div className="q-module-head">
-            <button
-              className="q-module-back"
-              onClick={() => setOpenModule(null)}
-            >
-              <ArrowLeft className="w-3.5 h-3.5" /> All modules
-            </button>
-            <div className="q-module-title">
-              {MODULES.find((m) => m.key === openModule)?.name}
-            </div>
-            <button
-              className="q-btn q-btn-primary"
-              onClick={() => openNew(openModule)}
-            >
-              + {MODULES.find((m) => m.key === openModule)?.newLabel}
-            </button>
+        <div className="q-welcome-head">
+          <div className="q-welcome-brand">
+            <img src="./logo1.png" alt="" />
+            <span>Kitabi</span>
           </div>
+          <p className="q-welcome-sub">
+            A writing station for stories, diaries, and journals.
+          </p>
+        </div>
 
-          {byModule[openModule].length === 0 ? (
-            <div className="q-module-empty">
-              {COMING_SOON[openModule] ?? 'No projects yet. Start one above.'}
+        {!openModule && (
+          <div className="q-book-grid">
+            {MODULES.map((m) => (
+              <BookCard
+                key={m.key}
+                module={m}
+                count={byModule[m.key].length}
+                onOpen={() => setOpenModule(m.key)}
+                onNew={() => openNew(m.key)}
+              />
+            ))}
+          </div>
+        )}
+
+        {openModule && (
+          <div className="q-module-view">
+            <div className="q-module-head">
+              <button
+                className="q-module-back"
+                onClick={() => setOpenModule(null)}
+              >
+                <ArrowLeft className="w-3.5 h-3.5" /> All modules
+              </button>
+              <div className="q-module-title">
+                {MODULES.find((m) => m.key === openModule)?.name}
+              </div>
+              <button
+                className="q-btn q-btn-primary"
+                onClick={() => openNew(openModule)}
+              >
+                + {MODULES.find((m) => m.key === openModule)?.newLabel}
+              </button>
             </div>
-          ) : (
-            <div className="q-module-list">
-              {byModule[openModule].map((p) => (
-                <div
-                  key={p.id}
-                  className="q-module-row"
-                  onClick={() => setActiveProject(p.id)}
-                >
-                  <div className="q-module-row-name">{p.name}</div>
-                  <div className="flex items-center gap-4">
-                    <div className="q-module-row-meta">
-                      updated {timeAgo(p.updatedAt)}
-                    </div>
-                    <div className="q-module-actions">
-                      <button
-                        className="q-icon-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setRenameTarget(p);
-                          setRenameValue(p.name);
-                        }}
-                        title="Rename"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        className="q-icon-btn text-destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          void handleDelete(p);
-                        }}
-                        title="Delete"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+
+            {byModule[openModule].length === 0 ? (
+              <div className="q-module-empty">
+                {COMING_SOON[openModule] ?? 'No projects yet. Start one above.'}
+              </div>
+            ) : (
+              <div className="q-module-list">
+                {byModule[openModule].map((p) => (
+                  <div
+                    key={p.id}
+                    className="q-module-row"
+                    onClick={() => setActiveProject(p.id)}
+                  >
+                    <div className="q-module-row-name">{p.name}</div>
+                    <div className="flex items-center gap-4">
+                      <div className="q-module-row-meta">
+                        updated {timeAgo(p.updatedAt)}
+                      </div>
+                      <div className="q-module-actions">
+                        <button
+                          className="q-icon-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRenameTarget(p);
+                            setRenameValue(p.name);
+                          }}
+                          title="Rename"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          className="q-icon-btn text-destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            void handleDelete(p);
+                          }}
+                          title="Delete"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+      </div>
 
       <NewProjectModal
         open={newOpen}
