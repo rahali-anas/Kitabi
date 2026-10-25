@@ -118,7 +118,7 @@ export function WelcomeScreen() {
         <div className="q-welcome-head">
           <div className="q-welcome-brand">
             <img src="./logo1.png" alt="" />
-            <span>Kitabi</span>
+            <span className="q-brand-text" >Kitabi</span>
           </div>
           <p className="q-welcome-sub">
             A writing station for stories, diaries, and journals.

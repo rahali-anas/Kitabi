@@ -901,3 +901,21 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
   border-color: #d18a9d;
   color: #d18a9d;
 }
+
+/* ═══════════════════════════════════════════════
+   Logo Typography
+   ═══════════════════════════════════════════════ */
+
+.q-brand-text,
+.q-welcome-brand span {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  color: var(--ink-0);
+}
+
+.q-welcome-brand span {
+  font-size: 42px;
+}

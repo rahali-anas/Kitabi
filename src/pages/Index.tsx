@@ -39,7 +39,7 @@ export function Index({ projectId }: { projectId: string }) {
           </span>
         </h2>
       </div>
-
+      
       <section className="q-index-section">
         <div className="q-index-section-head">
           <span className="q-index-section-label">Manuscript Stats</span>

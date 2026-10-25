@@ -33,11 +33,11 @@ import {
 
 const NAV: { key: View; label: string }[] = [
   { key: 'dashboard', label: 'Dashboard' },
+  { key: 'index', label: 'Index' },
   { key: 'manuscript', label: 'Manuscript' },
   { key: 'characters', label: 'Characters' },
   { key: 'storylines', label: 'Storylines' },
   { key: 'notes', label: 'Notes' },
-  { key: 'index', label: 'Index' },
   { key: 'lore', label: 'Power System' },
 ];
 
@@ -206,14 +206,14 @@ function App() {
         >
           <img 
             src={
-              isDiary ? './modakirati.png' 
-              : isJournal ? './modawanati.png' 
-              : './qisati.png'
+              isDiary ? './logo2.png' 
+              : isJournal ? './logo3.png' 
+              : './logo.png'
             } 
             alt="" 
           />
-          <span>
-            {isDiary ? 'Modakirati' : isJournal ? 'Modawanati' : 'Qisati'}
+          <span className="q-brand-text">
+            {isDiary ? 'Modakirati' : isJournal ? 'Diftari' : 'Qisati'}
           </span>
         </button>
 
