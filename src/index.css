@@ -759,22 +759,6 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
   box-shadow: none;
 }
 
-.q-journal-date {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 0 0 24px;
-  user-select: none;
-  cursor: default;
-  pointer-events: none;
-}
-
-.q-journal-date-rule {
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
-
 .q-journal-date-label {
   font-size: 11px;
   text-transform: uppercase;
@@ -918,4 +902,17 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
 
 .q-welcome-brand span {
   font-size: 42px;
+}
+/* Style the native H3 headings inside the journal */
+.q-journal-body .bn-editor h3 {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink-3);
+  text-align: center;
+  margin: 48px 0 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
 }
