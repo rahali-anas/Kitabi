@@ -96,7 +96,7 @@ export function WelcomeScreen() {
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
         
         {/* Top-right controls */}
-        <div className='q-topbar-right'>
+        <div style={{ position: 'absolute', top: 24, right: 24, display: 'flex', gap: 8, zIndex: 10 }}>
           <button
             className="q-icon-btn"
             onClick={() => alert('Calendar coming next')}
@@ -104,7 +104,6 @@ export function WelcomeScreen() {
           >
             <CalendarIcon className="w-4 h-4" />
           </button>
-
           <button
             className="q-icon-btn"
             onClick={toggleTheme}
@@ -112,17 +111,22 @@ export function WelcomeScreen() {
           >
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          
         </div>
 
         <div className="q-welcome-head">
           <div className="q-welcome-brand">
-            <img src="./logo1.png" alt="" />
-            <span className="q-brand-text" >Kitabi</span>
+            <img src="./logo.png" alt="" />
+            <span className="q-brand-text">Kitabi</span>
           </div>
           <p className="q-welcome-sub">
             A writing station for stories, diaries, and journals.
           </p>
+          {/* Diamond Ornament */}
+          <div className="flex items-center gap-2 mt-6 opacity-30">
+            <div className="h-[1px] w-12 bg-[var(--ink-0)]"></div>
+            <div className="w-1.5 h-1.5 rotate-45 border border-[var(--ink-0)]"></div>
+            <div className="h-[1px] w-12 bg-[var(--ink-0)]"></div>
+          </div>
         </div>
 
         {!openModule && (

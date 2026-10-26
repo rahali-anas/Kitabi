@@ -404,8 +404,41 @@
 .q-dialog-title { font-size: 17px; font-weight: 600; color: var(--ink-0); }
 .q-modal-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(0, 0, 0, 0.35); display: flex; align-items: center; justify-content: center; padding: 24px; animation: q-fade var(--dur-2) var(--ease) both; }
 .dark .q-modal-backdrop { background: rgba(0, 0, 0, 0.65); }
-.q-modal { width: 100%; max-height: 88vh; background: var(--paper-0); border: 1px solid var(--ink-0); display: flex; flex-direction: column; animation: q-fade-up var(--dur-3) var(--ease) both; }
-.q-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 22px; border-bottom: 1px solid var(--line); }
+.q-modal {
+  position: relative;
+  width: 100%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  animation: q-fade-up var(--dur-3) var(--ease) both;
+  
+  /* Padding to keep content away from the torn edges */
+  padding: 48px 64px;
+}
+
+/* The Paper Texture Background */
+.q-modal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  
+  /* The image and the color underneath */
+  
+  background-image: url('/paper-modal.png');
+  background-size: 100% 100%;
+  background-position: center;
+  
+  
+  /* Optional: Add a slight drop shadow to the paper */
+  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.15));
+}
+/* Dark Mode Override */
+.dark .q-modal::before {
+  filter: invert(0.9) sepia(0.2) drop-shadow(0 16px 32px rgba(0, 0, 0, 0.5));
+}
+.q-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 5px; border-bottom: 1px solid var(--line); }
 .q-modal-title { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; color: var(--ink-0); }
 .q-modal-close { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink-2); cursor: pointer; transition: color var(--dur-2) var(--ease), background var(--dur-2) var(--ease); }
 .q-modal-close:hover { color: var(--ink-0); background: var(--paper-3); }
@@ -657,21 +690,145 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
 .q-search-hint { padding: 20px 16px; font-size: 12px; color: var(--ink-3); font-style: italic; }
 
 /* ═══════════════════════════════════════════════
-   Welcome — Module Cards (Closed Book)
+   Welcome — module cards (Book Design)
    ═══════════════════════════════════════════════ */
 
-.q-book-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; width: 100%; max-width: 1080px; margin-bottom: 32px; }
-.q-book {display: flex; flex-direction: column; gap: 14px; cursor: pointer; animation: q-fade-up var(--dur-3) var(--ease) both; }
-.q-book-shape { position: relative; display: flex; min-height: 500px; border: 1px solid var(--line); background: var(--paper-0); transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease); }
-.q-book:hover .q-book-shape { transform: translateY(-2px); border-color: var(--ink-0); }
-.q-book-spine { width: 20px; background: var(--ink-0); flex-shrink: 0; }
-.q-book-content { border:#0d0d0d solid 1px;flex: 1; padding: 36px 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-.q-book-title { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink-0); font-style: italic; }
-.q-book-rule { width: 40px; height: 1px; background: var(--ink-3); margin: 14px 0; }
-.q-book-subtitle { font-size: 12.5px; color: var(--ink-2); line-height: 1.55; max-width: 220px; }
-.q-book-count { margin-top: 22px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600; color: var(--ink-3); }
-.q-book-new { align-self: center; padding: 8px 18px; border: 1px solid var(--ink-0); background: transparent; color: var(--ink-0); font-family: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease); }
-.q-book-new:hover { background: var(--ink-0); color: var(--paper-0); }
+.q-book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 50px;
+  width: 100%;
+  max-width: 1000px;
+  margin-bottom: 32px;
+  padding: 0px;
+}
+
+.q-book {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.q-book-shape {
+  position: relative;
+  display: flex;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-width: 280px;
+  
+  /* The fabric texture */
+  background-color: var(--paper-3);
+  background-image: url('/book.jpg');
+  background-size: 400px; /* Size of one fabric "tile" */
+  background-blend-mode: multiply;
+  
+  border: 1px solid var(--line);
+  border-radius: 2px 8px 8px 2px;
+  box-shadow: 
+    inset 4px 0 10px rgba(0,0,0,0.05),
+    0 12px 32px rgba(0, 0, 0, 0.08),
+    -4px 4px 12px rgba(0, 0, 0, 0.04);
+  transition: transform var(--dur-3) var(--ease), box-shadow var(--dur-3) var(--ease);
+}
+
+/* Make the content sit on top of the texture */
+.q-book-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.q-book:hover .q-book-shape {
+  transform: translateY(-6px);
+  box-shadow: 
+    inset 4px 0 10px rgba(0,0,0,0.03),
+    0 24px 48px rgba(0, 0, 0, 0.12),
+    -6px 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Spine */
+.q-book-spine {
+  width: 12px;
+  height: 100%;
+  background: var(--ink-0);
+  border-radius: 2px 0 0 2px;
+  flex-shrink: 0;
+  border-right: 2px solid rgba(255,255,255,0.1);
+}
+
+.q-book-content {
+  flex: 1;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.q-book-icon {
+  color: var(--ink-0);
+  margin-bottom: 32px;
+  opacity: 0.8;
+}
+
+.q-book-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink-0);
+  font-style: italic;
+}
+
+.q-book-rule {
+  width: 48px;
+  height: 1px;
+  background: var(--ink-3);
+  margin: 16px 0 24px;
+  opacity: 0.5;
+}
+
+.q-book-subtitle {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.q-book-count {
+  margin-top: auto;
+  padding-top: 32px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.q-book-new {
+  padding: 8px 18px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-3);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color var(--dur-2) var(--ease);
+}
+
+.q-book:hover .q-book-new {
+  color: var(--ink-0);
+  border-color: var(--line-2);
+}
 
 /* ── Module detail view ───────────────────────── */
 .q-module-view { width: 100%; max-width: 1080px; }
@@ -866,23 +1023,46 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
 }
 
 .q-toast {
-  background: var(--paper-0);
-  border: 1px solid var(--ink-0);
-  padding: 10px 16px;
+  position: relative;
+  padding: 15px 10px 15px 30px;  /* Adjust padding to fit inside the spiral binding */
   font-size: 12.5px;
   color: var(--ink-0);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   animation: q-fade-up var(--dur-3) var(--ease) both;
   pointer-events: auto;
+  min-width: 220px;
+  text-align: center;
+  border: none; /* Remove any inherited borders */
 }
 
+/* The Paper Background */
+.q-toast::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  
+  /* Use the image as the background */
+  background-image: url('/nn.png');
+  background-size: 100% ; /* Stretch to fit the toast */
+  background-position: center;
+  background-repeat: no-repeat;
+  
+   
+
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+/* Dark Mode */
+.dark .q-toast::before {
+  /* Invert the paper to dark grey if the image is pure white */
+  filter: invert(0.9) sepia(0.2) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+}
+
+/* Error state */
 .q-toast-error {
-  border-color: #a8323c;
   color: #a8323c;
 }
-
 .dark .q-toast-error {
-  border-color: #d18a9d;
   color: #d18a9d;
 }
 
