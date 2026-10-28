@@ -49,7 +49,7 @@ export function Storylines({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div className="q-page">
+    <div >
       <div className="q-page-head">
         <h2 className="q-page-title">
           Storylines

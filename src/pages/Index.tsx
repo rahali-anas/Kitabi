@@ -30,7 +30,7 @@ export function Index({ projectId }: { projectId: string }) {
   const matrix = computePresence(characters, chapters);
 
   return (
-    <div>
+    <div >
       <div className="q-page-head">
         <h2 className="q-page-title">
           Index
@@ -47,26 +47,29 @@ export function Index({ projectId }: { projectId: string }) {
         <StatsStrip chapters={chapters} />
       </section>
 
-      <section className="q-index-section">
-        <div className="q-index-section-head">
-          <span className="q-index-section-label">Cast</span>
-        </div>
-        <CastSummary matrix={matrix} />
-      </section>
+      {/* New Grid Layout for the bottom three sections */}
+      <div className="q-index-grid">
+        
+        <section className="q-index-section">
+          <div className="q-index-section-head">
+            <span className="q-index-section-label">Cast</span>
+          </div>
+          <CastSummary matrix={matrix} />
+        </section>
 
-      <section className="q-index-section">
-        <div className="q-index-section-head">
-          <span className="q-index-section-label">Health</span>
-        </div>
-        <HealthLine projectId={projectId} />
-      </section>
-
-      <section className="q-index-section">
-        <div className="q-index-section-head">
-          <span className="q-index-section-label">Character Presence</span>
-        </div>
-        <Heatmap matrix={matrix} />
-      </section>
+        <section className="q-index-section">
+          <div className="q-index-section-head">
+            <span className="q-index-section-label">Health</span>
+          </div>
+          <HealthLine projectId={projectId} />
+        </section>
+      </div>
+      <section className="q-index-section" >
+          <div className="q-index-section-head">
+            <span className="q-index-section-label">Character Presence</span>
+          </div>
+          <Heatmap matrix={matrix} />
+        </section>
     </div>
   );
 }

@@ -56,7 +56,7 @@ export function Notes({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div className="q-page">
+    <div >
       <div className="q-page-head">
         <h2 className="q-page-title">
           World Notes

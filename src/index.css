@@ -237,7 +237,7 @@
    ═══════════════════════════════════════════════ */
 
 .q-page { max-width: 1180px; margin: 0 auto; padding: 40px 40px 96px; }
-@media (max-width: 720px) { .q-page { padding: 24px 20px 64px; } .q-topbar { padding: 10px 16px; } }
+@media (max-width: 720px) { .q-page { padding: 2px 20px 64px; } .q-topbar { padding: 10px 16px; } }
 
 .q-page-head {
   display: flex; align-items: baseline; justify-content: space-between;
@@ -928,7 +928,18 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
    Index
    ═══════════════════════════════════════════════ */
 
-.q-index-section { margin-bottom: 40px; }
+.q-index-section { margin: 10px; }
+.q-index-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 900px) {
+  .q-index-grid {
+    grid-template-columns: 1fr;
+    gap: 0; /* Remove gap on mobile since sections have margin-bottom */
+  }
+}
 .q-index-section-head { padding-bottom: 10px; border-bottom: 1px solid var(--ink-0); margin-bottom: 20px; }
 .q-index-section-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600; color: var(--ink-0); }
 .q-heatmap-wrap { width: 100%; overflow-x: auto; padding-bottom: 8px; }

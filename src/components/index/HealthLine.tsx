@@ -106,10 +106,7 @@ export function HealthLine({ projectId }: { projectId: string }) {
             n={health.emptyChapters}
             label={`empty chapter${health.emptyChapters === 1 ? '' : 's'}`}
           />
-          <Stat
-            n={health.unusedCharacters}
-            label={`unused character${health.unusedCharacters === 1 ? '' : 's'}`}
-          />
+          
           <Stat
             n={health.brokenLinks}
             label={`broken link${health.brokenLinks === 1 ? '' : 's'}`}
