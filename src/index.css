@@ -172,66 +172,107 @@
 }
 
 /* ═══════════════════════════════════════════════
-   Shell
+   Shell — Left Sidebar Layout
    ═══════════════════════════════════════════════ */
 
-.q-topbar {
-  position: sticky; top: 0; z-index: 40;
-  display: flex; align-items: center; gap: 4px;
-  padding: 12px 24px;
-  background: var(--paper-0);
-  border-bottom: 1px solid var(--line);
+.q-app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
 }
 
+.q-main-content {
+  flex: 1;
+  min-width: 0; /* Prevents horizontal scrolling */
+  margin-left: 220px; /* Width of the sidebar */
+}
+
+.q-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 220px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 16px;
+  background: var(--paper-0);
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+}
+
+/* Brand at the top */
 .q-brand {
-  display: flex; align-items: center; gap: 10px;
-  flex-shrink: 0; font-size: 15px; font-weight: 600;
-  color: var(--ink-0); padding-right: 16px;
-  border-right: 1px solid var(--line); margin-right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-0);
+  text-align: left;
 }
 .q-brand img { width: 20px; height: 20px; object-fit: contain; }
 
+/* Project button */
 .q-project-btn {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 10px; border: none; background: transparent;
-  color: var(--ink-2); font-size: 12.5px; font-weight: 500;
-  cursor: pointer; transition: color var(--dur-2) var(--ease);
-  max-width: 220px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: var(--paper-3);
+  color: var(--ink-0);
+  border-radius: 4px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-2) var(--ease);
+  text-align: left;
 }
-.q-project-btn:hover { color: var(--ink-0); }
+.q-project-btn:hover { background: var(--paper-4); }
 .q-project-btn .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* Nav links stack vertically */
 .q-nav {
-  display: flex; align-items: center; gap: 0;
-  margin-left: 16px; border-left: 1px solid var(--line); padding-left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 0;
+  border-left: none;
+  padding-left: 0;
 }
 
 .q-nav-btn {
-  padding: 6px 12px; border: none; background: transparent;
-  color: var(--ink-2); font-size: 12.5px; font-weight: 500;
-  cursor: pointer; transition: color var(--dur-2) var(--ease), background var(--dur-2) var(--ease);
-  position: relative;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 4px;
+  transition: all var(--dur-2) var(--ease);
 }
 .q-nav-btn:hover { color: var(--ink-0); background: var(--paper-3); }
-.q-nav-btn.active { color: var(--ink-0); font-weight: 600; background: transparent; }
-.q-nav-btn.active::after {
-  content: ""; position: absolute; left: 8px; right: 8px; bottom: -13px;
-  height: 2px; background: var(--ink-0);
-}
+.q-nav-btn.active { color: var(--ink-0); font-weight: 600; background: var(--paper-3); }
+.q-nav-btn.active::after { display: none; } /* Remove the old underline */
 
+/* Icons pushed to the bottom */
 .q-topbar-right {
-  margin-left: auto; display: flex; align-items: center; gap: 8px;
-  padding-left: 16px; border-left: 1px solid var(--line);
+  margin-top: auto; /* Pushes to bottom */
+  margin-left: 0;
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  border-left: none;
+  border-top: 1px solid var(--line);
 }
-
-.q-icon-btn {
-  width: 30px; height: 30px;
-  display: inline-flex; align-items: center; justify-content: center;
-  border: none; background: transparent; color: var(--ink-2);
-  cursor: pointer; transition: color var(--dur-2) var(--ease), background var(--dur-2) var(--ease);
-}
-.q-icon-btn:hover { color: var(--ink-0); background: var(--paper-3); }
-
 /* ═══════════════════════════════════════════════
    Page
    ═══════════════════════════════════════════════ */
@@ -336,7 +377,7 @@
 
 .q-stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 @media (max-width: 640px) { .q-stats { grid-template-columns: repeat(2, 1fr); } }
-.q-stat { padding: 20px 0; border: none; border-right: 1px solid var(--line); background: transparent; text-align: left; cursor: default; font-family: inherit; }
+.q-stat { padding: 20px 0; border: none; border-right: 1px solid var(--line); background: transparent; text-align: left; cursor: default; font-family: inherit;}
 .q-stat:last-child { border-right: none; }
 .q-stat:not(:first-child) { padding-left: 24px; }
 @media (max-width: 640px) {
@@ -497,7 +538,7 @@ button.q-brand:hover span { color: var(--ink-2); }
   flex-direction: column;
   align-items: center;
 }
-.q-ms-drawer { width: 100%; max-width: 900px; }
+.q-ms-drawer { width: 100%; max-width: 1300px; }
 
 /* Row of tabs */
 /* Row of tabs container */
@@ -659,6 +700,25 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
 .q-focus-exit { position: fixed; top: 20px; right: 24px; z-index: 60; padding: 6px 12px; border: 1px solid var(--line); background: var(--paper-0); color: var(--ink-2); font-size: 11px; font-family: inherit; cursor: pointer; transition: color var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease); }
 .q-focus-exit:hover { color: var(--ink-0); border-color: var(--ink-0); }
 
+/* Focus Mode for Journal */
+body.focus-mode .q-journal-bar {
+  display: none;
+}
+
+body.focus-mode .q-journal {
+  min-height: 100vh;
+  padding: 0;
+}
+
+body.focus-mode .q-journal-body {
+  max-width: 800px; /* Wider text area in focus mode */
+  padding: 96px 32px 160px;
+}
+
+body.focus-mode .q-journal-body .bn-editor {
+  font-size: 18px;
+  line-height: 1.9;
+}
 /* ═══════════════════════════════════════════════
    Wiki Links & Picker
    ═══════════════════════════════════════════════ */
@@ -1069,9 +1129,6 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
   background-size: 100% ; /* Stretch to fit the toast */
   background-position: center;
   background-repeat: no-repeat;
-  
-   
-
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
 }
 

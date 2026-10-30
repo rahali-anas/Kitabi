@@ -96,7 +96,7 @@ export function WelcomeScreen() {
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
         
         {/* Top-right controls */}
-        <div style={{ position: 'absolute', top: 24, right: 24, display: 'flex', gap: 8, zIndex: 10 }}>
+        <div style={{ position: 'absolute', top: 24, right: 24, display: 'flex', gap: 14, zIndex: 10 }}>
           <button className="q-icon-btn" onClick={() => alert('Calendar coming next')} title="Calendar">
             <CalendarIcon className="w-4 h-4" />
           </button>
@@ -149,9 +149,9 @@ export function WelcomeScreen() {
               </div>
             ) : (
               <div className="q-project-grid">
-                {byModule[openModule].map((p, i) => (
+                {byModule[openModule].map((p) => (
                   <div key={p.id} className="q-project-card" onClick={() => openProject(p.id)}>
-                    <div className="q-project-number">{String(i + 1).padStart(2, '0')}</div>
+                    
                     <div className="q-project-card-body">
                       <div className="q-project-card-title">{p.name}</div>
                       <div className="q-project-card-meta">

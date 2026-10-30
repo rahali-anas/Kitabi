@@ -197,7 +197,7 @@ function App() {
   const isDiary = activeProject.type === 'diary';
 
   return (
-    <div className="min-h-screen">
+    <div className="q-app-layout">
       <header className="q-topbar">
         <button
           className="q-brand"
@@ -267,72 +267,74 @@ function App() {
         </div>
       </header>
 
-      <main className="q-page q-fade" key={view}>
-        {isJournal ? (
-          <Journal projectId={activeProject.id} />
-        ) : (
-          <>
-            {view === 'dashboard' && <Dashboard projectId={activeProject.id} />}
-            {view === 'manuscript' && (
-              <Manuscript projectId={activeProject.id} />
-            )}
-            {view === 'characters' && (
-              <Characters projectId={activeProject.id} />
-            )}
-            {view === 'storylines' && (
-              <Storylines projectId={activeProject.id} />
-            )}
-            {view === 'notes' && <Notes projectId={activeProject.id} />}
-            {view === 'index' && (
-              <Index projectId={activeProject.id} />
-            )}
-            {view === 'lore' && (
-              <PowerSystemPage projectId={activeProject.id} />
-            )}
-          </>
+      <div className="q-main-content">
+        <main className="q-page q-fade" key={view}>
+          {isJournal ? (
+            <Journal projectId={activeProject.id} />
+          ) : (
+            <>
+              {view === 'dashboard' && <Dashboard projectId={activeProject.id} />}
+              {view === 'manuscript' && (
+                <Manuscript projectId={activeProject.id} />
+              )}
+              {view === 'characters' && (
+                <Characters projectId={activeProject.id} />
+              )}
+              {view === 'storylines' && (
+                <Storylines projectId={activeProject.id} />
+              )}
+              {view === 'notes' && <Notes projectId={activeProject.id} />}
+              {view === 'index' && (
+                <Index projectId={activeProject.id} />
+              )}
+              {view === 'lore' && (
+                <PowerSystemPage projectId={activeProject.id} />
+              )}
+            </>
+          )}
+        </main>
+
+        {focusMode && (
+          <button
+            className="q-focus-exit"
+            onClick={() => setFocusMode(false)}
+          >
+            Exit focus — Esc
+          </button>
         )}
-      </main>
 
-      {focusMode && (
-        <button
-          className="q-focus-exit"
-          onClick={() => setFocusMode(false)}
-        >
-          Exit focus — Esc
-        </button>
-      )}
+        <ProjectsModal
+          open={projectsOpen}
+          onClose={() => setProjectsOpen(false)}
+        />
 
-      <ProjectsModal
-        open={projectsOpen}
-        onClose={() => setProjectsOpen(false)}
-      />
+        <CharacterModal
+          open={!!wikiChar}
+          onClose={() => setWikiChar(null)}
+          projectId={activeProject.id}
+          editing={wikiChar}
+        />
+        <NoteModal
+          open={!!wikiNote}
+          onClose={() => setWikiNote(null)}
+          projectId={activeProject.id}
+          editing={wikiNote}
+        />
+        <StorylineModal
+          open={!!wikiStoryline}
+          onClose={() => setWikiStoryline(null)}
+          projectId={activeProject.id}
+          editing={wikiStoryline}
+        />
 
-      <CharacterModal
-        open={!!wikiChar}
-        onClose={() => setWikiChar(null)}
-        projectId={activeProject.id}
-        editing={wikiChar}
-      />
-      <NoteModal
-        open={!!wikiNote}
-        onClose={() => setWikiNote(null)}
-        projectId={activeProject.id}
-        editing={wikiNote}
-      />
-      <StorylineModal
-        open={!!wikiStoryline}
-        onClose={() => setWikiStoryline(null)}
-        projectId={activeProject.id}
-        editing={wikiStoryline}
-      />
+        <SearchModal
+          open={searchOpen}
+          onClose={() => setSearchOpen(false)}
+          projectId={activeProject.id}
+        />
 
-      <SearchModal
-        open={searchOpen}
-        onClose={() => setSearchOpen(false)}
-        projectId={activeProject.id}
-      />
-
-      {globalModals}
+        {globalModals}
+      </div>
     </div>
   );
 }
