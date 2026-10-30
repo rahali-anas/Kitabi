@@ -87,12 +87,6 @@ export function ProjectsModal({
               key={p.id} 
               className={`q-project-item ${isActive ? 'active' : ''}`}
               onClick={() => !isActive && switchTo(p.id)}
-              style={{ 
-                cursor: isActive ? 'default' : 'pointer',
-                background: isActive ? 'var(--paper-3)' : 'transparent',
-                borderBottom: '1px solid var(--line)',
-                padding: '12px 16px',
-              }}
             >
               <div className="q-project-info">
                 <div className="q-project-name">

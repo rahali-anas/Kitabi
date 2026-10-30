@@ -465,6 +465,18 @@
 .q-project-list { display: flex; flex-direction: column; }
 .q-project-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .q-project-item:last-child { border-bottom: none; }
+.q-project-item:hover {
+  background: var(--paper-3);
+  
+  transform: translateY(-6px);
+}
+
+/* Active state (so you know which project you're currently in) */
+.q-project-item.active {
+  background: var(--paper-2);
+  border-left: 3px solid var(--ink-0);
+  padding-left: 9px; /* Adjust so it aligns with the new left border */
+}
 .q-project-info { flex: 1; min-width: 0; }
 .q-project-name { font-size: 13.5px; font-weight: 500; color: var(--ink-0); display: flex; align-items: center; gap: 8px; }
 .q-project-badge { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; padding: 2px 6px; border: 1px solid var(--ink-0); color: var(--ink-0); }
@@ -708,7 +720,7 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  cursor: pointer;
+  
 }
 
 .q-book-shape {
@@ -833,9 +845,9 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
 /* ── Module detail view ───────────────────────── */
 .q-module-view { width: 100%; max-width: 1080px; }
 .q-module-head { display: flex; align-items: center; gap: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--ink-0); margin-bottom: 8px; }
-.q-module-back { display: inline-flex; align-items: center; gap: 6px; padding: 6px 0; border: none; background: transparent; color: var(--ink-2); font-family: inherit; font-size: 12px; cursor: pointer; transition: color var(--dur-2) var(--ease); }
+.q-module-back { display: inline-flex; align-items: center; gap: 6px; padding: 20px ; border: none; background: transparent; color: var(--ink-2); font-family: inherit; font-size: 12px; cursor: pointer; transition: color var(--dur-2) var(--ease); }
 .q-module-back:hover { color: var(--ink-0); }
-.q-module-title { flex: 1; font-size: 22px; font-weight: 600; font-style: italic; letter-spacing: -0.005em; color: var(--ink-0); }
+.q-module-title { flex: 1; font-size: 22px; font-weight: 600; font-style: italic; letter-spacing: -0.005em; color: var(--ink-0);border-left: 1px solid var(--line);padding-left: 10px; }
 .q-module-list { display: flex; flex-direction: column; }
 .q-module-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; border: none; border-bottom: 1px solid var(--line); background: transparent; text-align: left; cursor: pointer; font-family: inherit; transition: background var(--dur-2) var(--ease), padding-left var(--dur-2) var(--ease); }
 .q-module-actions {display: flex; gap: 4px;transition: opacity var(--dur-2) var(--ease);}
@@ -1106,4 +1118,251 @@ body.focus-mode .q-ms-editor .bn-editor { font-size: 18px; line-height: 1.9; }
   margin: 48px 0 24px;
   padding-top: 24px;
   border-top: 1px solid var(--line);
+}
+/* ═══════════════════════════════════════════════
+   Project Review (Module View)
+   ═══════════════════════════════════════════════ */
+
+.q-module-view {
+  width: 100%;
+  max-width: 1250px; /* Increase from 1080px to fit 6 cards */
+  margin-top: 40px;
+}
+
+.q-module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  border-bottom: 1px solid var(--line-2);
+  margin-bottom: 40px;
+}
+
+.q-module-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color var(--dur-2) var(--ease);
+}
+.q-module-back:hover { color: var(--ink-0); }
+
+.q-module-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--ink-0);
+}
+
+/* ═══════════════════════════════════════════════
+   Project Review (Stacked Drawer)
+   ═══════════════════════════════════════════════ */
+
+.q-project-grid {
+  display: flex;
+  justify-content: flex-start; /* Ensure it's left-aligned */
+  padding: 40px 20px 80px;
+  margin-bottom: 40px;
+  flex-wrap: wrap; 
+  row-gap: 60px; 
+}
+
+.q-project-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  
+  /* Fixed dimensions for the cards so they stack neatly */
+  width: 240px;
+  height: 320px;
+  flex-shrink: 0;
+  
+  background: var(--paper-0);
+  border: 1px solid var(--line);
+  padding: 24px;
+  cursor: inherit;
+  
+  /* The magic overlap */
+  margin-left: -60px;
+  
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.04);
+  transition: transform var(--dur-3) var(--ease), box-shadow var(--dur-3) var(--ease), margin var(--dur-3) var(--ease);
+  transform-origin: bottom left;
+}
+
+/* Remove the overlap for the first card so it doesn't hit the edge */
+.q-project-card:first-child {
+  margin-left: 0;
+}
+/* ADD THIS: Reset the overlap on the 7th card (and 13th, 19th, etc.) */
+.q-project-card:nth-child(6n + 1) {
+  margin-left: 0;
+}
+.dark .q-project-card {
+  background: var(--paper-2);
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Hover Effect: Lift and push neighbors */
+.q-project-card:hover {
+  transform: translateY(-16px) rotate(-2deg);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.1);
+  margin-right: 20px; /* Pushes the next card away */
+  z-index: 50; /* Brings to front */
+}
+
+.q-project-card:hover ~ .q-project-card {
+  transform: translateX(20px); /* Pushes the rest of the cards to the right */
+}
+
+/* Active card (the one you are currently inside) */
+.q-project-card.active {
+  border: 2px solid var(--ink-0);
+  z-index: 10;
+}
+
+.dark .q-project-card {
+  background: var(--paper-2);
+}
+
+.q-project-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+  border-color: var(--ink-3);
+}
+
+.q-project-number {
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--ink-3);
+}
+
+.q-project-card-body {
+  margin-top: auto;
+}
+
+.q-project-card-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 26px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--ink-0);
+  margin-bottom: 4px;
+}
+
+.q-project-card-meta {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.q-project-actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease);
+}
+
+.q-project-card:hover .q-project-actions {
+  opacity: 1;
+}
+
+.q-project-actions .q-icon-btn {
+  color: var(--ink-2);
+  background: var(--paper-0);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.q-project-actions .q-icon-btn:hover {
+  color: var(--ink-0);
+  border-color: var(--ink-0);
+}
+
+.q-project-card:hover {
+  transform: translateY(-16px) rotate(-2deg);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.1);
+  margin-right: 20px; /* Pushes the next card away */
+  z-index: 50; /* Brings to front */
+}
+
+.q-project-card:hover ~ .q-project-card {
+  transform: translateX(20px); /* Pushes the rest of the cards to the right */
+}
+
+/* Active card (the one you are currently inside) */
+.q-project-card.active {
+  border: 2px solid var(--ink-0);
+  z-index: 10;
+}
+
+/* New Book Card */
+.q-project-card-new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper-1);
+  border: 2px dashed var(--line-2);
+  color: var(--ink-3);
+  font-size: 14px;
+  box-shadow: none;
+}
+.q-project-card-new:hover {
+  background: var(--paper-2);
+  border-color: var(--ink-0);
+  color: var(--ink-0);
+}
+
+.q-module-footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 40px;
+}
+/* Light mode (default) */
+body, html {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="24" height="24" viewBox="0 0 164 164" preserveAspectRatio="xMidYMid meet"><g transform="translate(0,164) scale(0.1,-0.1)" fill="%23111111" stroke="none"><path d="M89 1618 c-13 -24 6 -44 354 -371 133 -125 137 -129 192 -136 65 -9 102 -38 111 -89 14 -74 -54 -142 -128 -128 -51 9 -80 46 -89 111 -7 55 -11 59 -136 192 -327 348 -347 367 -371 354 -12 -6 -22 -17 -22 -24 0 -7 60 -223 134 -482 93 -324 140 -473 152 -482 10 -7 41 -13 68 -13 86 0 214 -37 335 -96 l114 -56 219 220 220 219 -56 114 c-59 121 -96 249 -96 335 0 27 -6 58 -13 68 -9 12 -158 59 -482 152 -259 74 -475 134 -482 134 -7 0 -18 -10 -24 -22z"/><path d="M1340 814 c-8 -4 -126 -117 -263 -253 -263 -262 -274 -277 -247 -340 14 -36 187 -206 218 -216 60 -18 78 -4 337 255 l250 250 0 50 c0 50 0 50 -101 151 -88 88 -106 101 -140 104 -21 3 -46 2 -54 -1z"/></g></svg>') 0 0, auto !important;
+}
+
+/* Dark mode */
+.dark body, .dark html {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="24" height="24" viewBox="0 0 164 164" preserveAspectRatio="xMidYMid meet"><g transform="translate(0,164) scale(0.1,-0.1)" fill="%23ededed" stroke="none"><path d="M89 1618 c-13 -24 6 -44 354 -371 133 -125 137 -129 192 -136 65 -9 102 -38 111 -89 14 -74 -54 -142 -128 -128 -51 9 -80 46 -89 111 -7 55 -11 59 -136 192 -327 348 -347 367 -371 354 -12 -6 -22 -17 -22 -24 0 -7 60 -223 134 -482 93 -324 140 -473 152 -482 10 -7 41 -13 68 -13 86 0 214 -37 335 -96 l114 -56 219 220 220 219 -56 114 c-59 121 -96 249 -96 335 0 27 -6 58 -13 68 -9 12 -158 59 -482 152 -259 74 -475 134 -482 134 -7 0 -18 -10 -24 -22z"/><path d="M1340 814 c-8 -4 -126 -117 -263 -253 -263 -262 -274 -277 -247 -340 14 -36 187 -206 218 -216 60 -18 78 -4 337 255 l250 250 0 50 c0 50 0 50 -101 151 -88 88 -106 101 -140 104 -21 3 -46 2 -54 -1z"/></g></svg>') 0 0, auto !important;
+}
+/* Force the custom cursor on all interactive elements */
+a, button, [role="button"], input[type="submit"], select, summary {
+  cursor: inherit !important;
+}
+
+/* If you want it to feel like a pen 'clicking', you can add a hover state */
+a:hover, button:hover, [role="button"]:hover {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="24" height="24" viewBox="0 0 164 164" preserveAspectRatio="xMidYMid meet"><g transform="translate(0,164) scale(0.1,-0.1)" fill="%23111111" stroke="none"><path d="M89 1618 c-13 -24 6 -44 354 -371 133 -125 137 -129 192 -136 65 -9 102 -38 111 -89 14 -74 -54 -142 -128 -128 -51 9 -80 46 -89 111 -7 55 -11 59 -136 192 -327 348 -347 367 -371 354 -12 -6 -22 -17 -22 -24 0 -7 60 -223 134 -482 93 -324 140 -473 152 -482 10 -7 41 -13 68 -13 86 0 214 -37 335 -96 l114 -56 219 220 220 219 -56 114 c-59 121 -96 249 -96 335 0 27 -6 58 -13 68 -9 12 -158 59 -482 152 -259 74 -475 134 -482 134 -7 0 -18 -10 -24 -22z"/><path d="M1340 814 c-8 -4 -126 -117 -263 -253 -263 -262 -274 -277 -247 -340 14 -36 187 -206 218 -216 60 -18 78 -4 337 255 l250 250 0 50 c0 50 0 50 -101 151 -88 88 -106 101 -140 104 -21 3 -46 2 -54 -1z"/></g></svg>') 0 0, auto !important;
+}
+
+.dark a:hover, .dark button:hover, .dark [role="button"]:hover {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="24" height="24" viewBox="0 0 164 164" preserveAspectRatio="xMidYMid meet"><g transform="translate(0,164) scale(0.1,-0.1)" fill="%23ededed" stroke="none"><path d="M89 1618 c-13 -24 6 -44 354 -371 133 -125 137 -129 192 -136 65 -9 102 -38 111 -89 14 -74 -54 -142 -128 -128 -51 9 -80 46 -89 111 -7 55 -11 59 -136 192 -327 348 -347 367 -371 354 -12 -6 -22 -17 -22 -24 0 -7 60 -223 134 -482 93 -324 140 -473 152 -482 10 -7 41 -13 68 -13 86 0 214 -37 335 -96 l114 -56 219 220 220 219 -56 114 c-59 121 -96 249 -96 335 0 27 -6 58 -13 68 -9 12 -158 59 -482 152 -259 74 -475 134 -482 134 -7 0 -18 -10 -24 -22z"/><path d="M1340 814 c-8 -4 -126 -117 -263 -253 -263 -262 -274 -277 -247 -340 14 -36 187 -206 218 -216 60 -18 78 -4 337 255 l250 250 0 50 c0 50 0 50 -101 151 -88 88 -106 101 -140 104 -21 3 -46 2 -54 -1z"/></g></svg>') 0 0, auto !important;
+}
+/* Force all hoverable/interactive elements to use the pen cursor */
+.q-book, .q-project-card, .q-welcome-card,.q-modal-body,.q-project-info, [role="button"], a, button {
+  cursor: inherit !important;
+}
+/* Force all hoverable/interactive elements to use the pen cursor */
+a, button, [role="button"], 
+.q-book, .q-project-card, .q-welcome-card, 
+.q-modal, .q-modal *, 
+.q-modal-backdrop {
+  cursor: inherit !important;
+}
+
+/* Override for text inputs so you can still see the I-beam while typing */
+input, textarea, .bn-editor {
+  cursor: text !important; 
 }
